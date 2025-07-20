@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <title>SlerfToken Admin</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎰 Creator Coin Spin</h1>
+            <p>Spin the wheel and win Creator tokens!</p>
+            <div class="revenue-badge">
+                <span>💰 Earn while you play!</span>
+            </div>
+        </div>
+
+        <!-- User Status -->
+        <div class="user-status">
+            <div class="status-card">
+                <h3>🎯 Your Status</h3>
+                <div id="user-status-content">
+                    <p>Connect wallet to see your status</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spin Options -->
+        <div class="spin-options">
+            <div class="option-card free-spin" id="free-spin-card">
+                <h3>🆓 Free Spin</h3>
+                <p>3 free spins per day</p>
+                <p class="reward-info">Base rewards: 1K-10K tokens</p>
+                <button id="free-spin-btn" class="spin-option-btn" disabled>
+                    <span class="btn-text">FREE SPIN</span>
+                </button>
+                <div id="free-spins-remaining" class="remaining-count"></div>
+            </div>
+
+            <div class="option-card paid-spin">
+                <h3>💎 Paid Spin</h3>
+                <p>0.001 ETH per spin</p>
+                <p class="reward-info">1.5x rewards: 1.5K-15K tokens</p>
+                <button id="paid-spin-btn" class="spin-option-btn" disabled>
+                    <span class="btn-text">PAID SPIN</span>
+                </button>
+            </div>
+
+            <div class="option-card premium-spin">
+                <h3>🚀 Premium Spin</h3>
+                <p>0.005 ETH per spin</p>
+                <p class="reward-info">2x rewards: 2K-20K tokens</p>
+                <button id="premium-spin-btn" class="spin-option-btn" disabled>
+                    <span class="btn-text">PREMIUM SPIN</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Wallet Connection -->
+        <div class="wallet-section">
+            <button id="connect-wallet-btn" class="connect-btn">Connect Wallet</button>
+            <div id="wallet-info" class="wallet-info hidden">
+                <p id="account-display"></p>
+                <p id="network-status"></p>
+            </div>
+            <p id="status-message" class="status-message"></p>
+        </div>
+
+        <!-- Spin Wheel Game -->
+        <div class="game-section">
+            <div class="wheel-container">
+                <div id="spin-wheel" class="wheel">
+                    <div class="segment" data-value="1000">1K</div>
+                    <div class="segment" data-value="2500">2.5K</div>
+                    <div class="segment" data-value="5000">5K</div>
+                    <div class="segment" data-value="1500">1.5K</div>
+                    <div class="segment" data-value="10000">10K</div>
+                    <div class="segment" data-value="3000">3K</div>
+                    <div class="segment" data-value="7500">7.5K</div>
+                    <div class="segment" data-value="2000">2K</div>
+                </div>
+                <div class="wheel-pointer">▼</div>
+                <div class="current-multiplier" id="current-multiplier">1x</div>
+            </div>
+        </div>
+
+        <!-- Game Stats -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Rewards</h4>
+                    <p id="total-rewards">Loading...</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Spins</h4>
+                    <p id="total-spins">Loading...</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Players</h4>
+                    <p id="unique-players">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-section">
+            <h2>🏆 Leaderboard</h2>
+            <button id="refresh-leaderboard-btn" class="refresh-btn">Refresh</button>
+            <div class="leaderboard-container">
+                <ul id="leaderboard-list">
+                    <li>Loading leaderboard...</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Revenue Info (for transparency) -->
+        <div class="revenue-info-section">
+            <h3>💰 How We Make Money</h3>
+            <div class="revenue-explanation">
+                <p>🎯 <strong>Transparent Revenue Model:</strong></p>
+                <ul>
+                    <li>🆓 3 free spins per day for everyone</li>
+                    <li>💎 Paid spins give 1.5x rewards</li>
+                    <li>🚀 Premium spins give 2x rewards</li>
+                    <li>🏠 10% house edge on all rewards</li>
+                    <li>⛽ We pay all gas fees for you!</li>
+                </ul>
+                <p><em>Fair play, transparent earnings, everyone wins!</em></p>
+            </div>
+        </div>
+
+        <!-- SlerfToken Admin Panel -->
+        <div class="section">
+            <h2>Token Information</h2>
+            <div class="form-group">
+                <label for="tokenAddress">Token Contract Address:</label>
+                <input type="text" id="tokenAddress" placeholder="Enter token contract address">
+                <button id="checkTokenButton">Check Token Info</button>
+            </div>
+            <div id="tokenInfo" class="info-box" style="display: none;">
+                <p>Name: <strong id="tokenName"></strong></p>
+                <p>Symbol: <strong id="tokenSymbol"></strong></p>
+                <p>Total Supply: <strong id="totalSupply"></strong></p>
+                <p>Owner Balance: <strong id="ownerBalance"></strong></p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Transfer Tokens</h2>
+            <div class="form-group">
+                <label for="recipientAddress">Recipient Address:</label>
+                <input type="text" id="recipientAddress" placeholder="0x...">
+            </div>
+            <div class="form-group">
+                <label for="transferAmount">Amount:</label>
+                <input type="number" id="transferAmount" placeholder="e.g., 100">
+            </div>
+            <div class="button-group">
+                <button id="transferButton">Transfer</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Mint Tokens (Owner Only)</h2>
+            <div class="form-group">
+                <label for="mintRecipient">Recipient Address:</label>
+                <input type="text" id="mintRecipient" placeholder="0x...">
+            </div>
+            <div class="form-group">
+                <label for="mintAmount">Amount:</label>
+                <input type="number" id="mintAmount" placeholder="e.g., 1000">
+            </div>
+            <div class="button-group">
+                <button id="mintButton">Mint</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Burn Tokens</h2>
+            <div class="form-group">
+                <label for="burnAmount">Amount:</label>
+                <input type="number" id="burnAmount" placeholder="e.g., 50">
+            </div>
+            <div class="button-group">
+                <button id="burnButton">Burn</button>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

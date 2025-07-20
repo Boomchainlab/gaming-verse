@@ -1,0 +1,23 @@
+{
+  "name": "creator-coin-spin",
+  "version": "1.0.0",
+  "description": "🚀 Futuristic spin-to-win game with Creator tokens on Base - by BoomchainLabs",
+  "main": "app.py",
+  "homepage": "https://creator-coin-spin.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoomchainLabs/creator-coin-spin.git"
+  },
+  "author": "BoomchainLabs (@agunnaya001)",
+  "license": "MIT",
+  "keywords": ["web3", "gaming", "crypto", "base", "tokens", "spin", "win", "boomchainlabs", "blockchain"],
+  "scripts": {
+    "start": "python app.py",
+    "dev": "python app.py",
+    "build": "echo 'Build complete'",
+    "deploy": "vercel --prod"
+  },
+  "engines": {
+    "python": "3.9.x"
+  }
+}

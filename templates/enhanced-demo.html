@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Creator Coin Spin - Enhanced Visual Effects Demo</title>
+    <link rel="stylesheet" href="/static/futuristic-styles.css">
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <style>
+        /* Demo-specific enhancements */
+        .demo-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            z-index: 2000;
+            font-weight: bold;
+            animation: demo-banner-pulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes demo-banner-pulse {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        .effects-showcase {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 1500;
+        }
+        
+        .effect-item {
+            margin: 5px 0;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .effect-item.active {
+            opacity: 1;
+            color: var(--brand-accent);
+        }
+        
+        .theme-switcher {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            z-index: 1500;
+        }
+        
+        .theme-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .theme-option:hover {
+            transform: scale(1.2);
+            border-color: white;
+        }
+        
+        .theme-option.active {
+            border-color: var(--brand-accent);
+            box-shadow: 0 0 20px var(--brand-accent);
+        }
+        
+        .demo-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            z-index: 1500;
+        }
+        
+        .demo-btn {
+            background: var(--gradient-secondary);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 51, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="theme-default">
+    <!-- Demo Banner -->
+    <div class="demo-banner">
+        🎨 ENHANCED VISUAL EFFECTS DEMO - Experience all the brand new animations! 🚀
+    </div>
+
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <h4 style="color: white; margin-bottom: 10px; font-size: 14px;">🎨 Themes</h4>
+        <div class="theme-option active default" onclick="switchTheme('default')" 
+             style="background: linear-gradient(45deg, #ff3366, #6633ff, #33ffcc);" 
+             title="Default Theme"></div>
+        <div class="theme-option cyberpunk" onclick="switchTheme('cyberpunk')" 
+             style="background: linear-gradient(45deg, #ff0080, #8000ff, #00ff80);" 
+             title="Cyberpunk Theme"></div>
+        <div class="theme-option ocean" onclick="switchTheme('ocean')" 
+             style="background: linear-gradient(45deg, #0066ff, #0033cc, #00ccff);" 
+             title="Ocean Theme"></div>
+        <div class="theme-option fire" onclick="switchTheme('fire')" 
+             style="background: linear-gradient(45deg, #ff4500, #ff6600, #ffaa00);" 
+             title="Fire Theme"></div>
+        <div class="theme-option galaxy" onclick="switchTheme('galaxy')" 
+             style="background: linear-gradient(45deg, #9966ff, #6633cc, #cc99ff);" 
+             title="Galaxy Theme"></div>
+    </div>
+
+    <!-- Effects Showcase -->
+    <div class="effects-showcase">
+        <h4 style="color: var(--brand-accent); margin-bottom: 10px;">✨ Active Effects</h4>
+        <div class="effect-item active">🌌 Cosmic Background</div>
+        <div class="effect-item active">⭐ Animated Stars</div>
+        <div class="effect-item active">🌈 Nebula Drift</div>
+        <div class="effect-item active">🎡 Wheel Glow Pulse</div>
+        <div class="effect-item active">💫 Ambient Particles</div>
+        <div class="effect-item">🎆 Celebration Particles</div>
+        <div class="effect-item">🔥 Fireworks Burst</div>
+        <div class="effect-item">⚡ Screen Flash</div>
+        <div class="effect-item">✨ Button Shine</div>
+        <div class="effect-item">🏆 Achievement Popup</div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <h4 style="color: white; margin-bottom: 10px; font-size: 14px;">🎮 Demo</h4>
+        <button class="demo-btn" onclick="triggerCelebration()">🎉 Celebration</button>
+        <button class="demo-btn" onclick="triggerFireworks()">🎆 Fireworks</button>
+        <button class="demo-btn" onclick="triggerFlash()">⚡ Flash</button>
+        <button class="demo-btn" onclick="showAchievement()">🏆 Achievement</button>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="game-container" style="margin-top: 60px;">
+        <!-- Animated Background -->
+        <div class="cosmic-background">
+            <div class="stars"></div>
+            <div class="nebula"></div>
+        </div>
+
+        <!-- Header with Player Stats -->
+        <header class="game-header">
+            <div class="player-profile">
+                <div class="avatar-container">
+                    <div class="avatar">🚀</div>
+                    <div class="level-badge">25</div>
+                </div>
+                <div class="player-info">
+                    <h3>Demo Player</h3>
+                    <div class="xp-bar">
+                        <div class="xp-fill" style="width: 75%"></div>
+                        <span class="xp-text">750 / 1000 XP</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">🪙</span>
+                    <span class="stat-value">1,250,000</span>
+                    <span class="stat-label">Tokens Won</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value">15</span>
+                    <span class="stat-label">Day Streak</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Futuristic Spin Wheel -->
+            <div class="wheel-section">
+                <div class="wheel-container">
+                    <div class="wheel-glow"></div>
+                    <div class="futuristic-wheel" id="demo-wheel">
+                        <div class="wheel-segment" data-value="1000">
+                            <span class="segment-value">1K</span>
+                            <span class="segment-icon">💎</span>
+                        </div>
+                        <div class="wheel-segment" data-value="2000">
+                            <span class="segment-value">2K</span>
+                            <span class="segment-icon">⚡</span>
+                        </div>
+                        <div class="wheel-segment" data-value="3000">
+                            <span class="segment-value">3K</span>
+                            <span class="segment-icon">🌟</span>
+                        </div>
+                        <div class="wheel-segment" data-value="5000">
+                            <span class="segment-value">5K</span>
+                            <span class="segment-icon">🚀</span>
+                        </div>
+                        <div class="wheel-segment" data-value="7500">
+                            <span class="segment-value">7.5K</span>
+                            <span class="segment-icon">💫</span>
+                        </div>
+                        <div class="wheel-segment" data-value="10000">
+                            <span class="segment-value">10K</span>
+                            <span class="segment-icon">🌈</span>
+                        </div>
+                        <div class="wheel-segment" data-value="15000">
+                            <span class="segment-value">15K</span>
+                            <span class="segment-icon">🎆</span>
+                        </div>
+                        <div class="wheel-segment" data-value="25000">
+                            <span class="segment-value">25K</span>
+                            <span class="segment-icon">👑</span>
+                        </div>
+                    </div>
+                    <div class="wheel-pointer">▼</div>
+                    <div class="multiplier-display">2.5x</div>
+                </div>
+            </div>
+
+            <!-- Spin Controls -->
+            <div class="spin-controls">
+                <button class="spin-btn normal" onclick="demoSpin('normal')">
+                    <span class="btn-icon">🎯</span>
+                    <span class="btn-text">DEMO SPIN</span>
+                    <span class="btn-subtitle">Experience the effects!</span>
+                </button>
+                
+                <button class="spin-btn mega" onclick="demoSpin('mega')">
+                    <span class="btn-icon">💎</span>
+                    <span class="btn-text">MEGA DEMO</span>
+                    <span class="btn-subtitle">Enhanced effects</span>
+                </button>
+                
+                <button class="spin-btn ultra" onclick="demoSpin('ultra')">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">ULTRA DEMO</span>
+                    <span class="btn-subtitle">Maximum effects</span>
+                </button>
+            </div>
+
+            <!-- Status Messages -->
+            <div class="status-panel">
+                <div class="status-message" id="demo-status">
+                    🎨 Welcome to the Enhanced Visual Effects Demo! Try the spin buttons above! 🚀
+                </div>
+            </div>
+        </main>
+
+        <!-- Particle Effects Container -->
+        <div class="particle-container" id="particle-container"></div>
+        
+        <!-- Achievement Popup -->
+        <div class="achievement-popup hidden" id="achievement-popup">
+            <div class="achievement-content">
+                <div class="achievement-icon">🏆</div>
+                <h3>Demo Achievement!</h3>
+                <div class="achievement-details">
+                    <div class="achievement-name">Visual Effects Master</div>
+                    <div class="achievement-desc">You've experienced all the enhanced effects!</div>
+                    <div class="achievement-reward">+5000 tokens!</div>
+                </div>
+                <button class="close-popup" onclick="closeAchievementPopup()">Awesome!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo JavaScript for enhanced effects
+        let currentTheme = 'default';
+        
+        // Theme switching
+        function switchTheme(theme) {
+            document.body.className = `theme-${theme}`;
+            currentTheme = theme;
+            
+            // Update active theme indicator
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`.theme-option.${theme}`).classList.add('active');
+            
+            // Update CSS variables based on theme
+            const themes = {
+                default: { primary: '#ff3366', secondary: '#6633ff', accent: '#33ffcc', gold: '#ffcc33' },
+                cyberpunk: { primary: '#ff0080', secondary: '#8000ff', accent: '#00ff80', gold: '#ffff00' },
+                ocean: { primary: '#0066ff', secondary: '#0033cc', accent: '#00ccff', gold: '#ffd700' },
+                fire: { primary: '#ff4500', secondary: '#ff6600', accent: '#ffaa00', gold: '#ffd700' },
+                galaxy: { primary: '#9966ff', secondary: '#6633cc', accent: '#cc99ff', gold: '#ffcc99' }
+            };
+            
+            const colors = themes[theme];
+            document.documentElement.style.setProperty('--brand-primary', colors.primary);
+            document.documentElement.style.setProperty('--brand-secondary', colors.secondary);
+            document.documentElement.style.setProperty('--brand-accent', colors.accent);
+            document.documentElement.style.setProperty('--brand-gold', colors.gold);
+        }
+        
+        // Demo spin function
+        function demoSpin(type) {
+            const wheel = document.getElementById('demo-wheel');
+            const status = document.getElementById('demo-status');
+            
+            // Disable buttons temporarily
+            document.querySelectorAll('.spin-btn').forEach(btn => btn.disabled = true);
+            
+            // Update status
+            status.innerHTML = `🎯 Spinning the ${type.toUpperCase()} wheel with enhanced effects...`;
+            
+            // Animate wheel
+            const rotation = Math.floor(Math.random() * 360) + 1800;
+            wheel.style.transform = `rotate(${rotation}deg)`;
+            
+            // Enhanced glow effect
+            wheel.style.boxShadow = `
+                0 0 60px var(--brand-primary),
+                0 0 120px var(--brand-secondary),
+                0 0 180px var(--brand-accent),
+                inset 0 0 80px rgba(255, 255, 255, 0.2)
+            `;
+            
+            // Activate effect indicators
+            activateEffect('🎆 Celebration Particles');
+            activateEffect('🔥 Fireworks Burst');
+            activateEffect('⚡ Screen Flash');
+            
+            // Create spinning particles
+            createSpinningParticles();
+            
+            setTimeout(() => {
+                // Show result
+                const rewards = { normal: 10000, mega: 50000, ultra: 250000 };
+                const reward = rewards[type];
+                
+                status.innerHTML = `
+                    <div style="animation: brand-result-bounce 0.8s ease-out;">
+                        🎉 <strong style="color: var(--brand-gold);">INCREDIBLE!</strong> 
+                        You won <span style="color: var(--brand-accent); font-size: 1.2em;">
+                            ${reward.toLocaleString()}
+                        </span> Creator tokens!<br>
+                        <small style="opacity: 0.9;">
+                            ${type.toUpperCase()} spin with enhanced visual effects!
+                        </small>
+                    </div>
+                `;
+                
+                // Trigger celebration
+                triggerCelebration();
+                triggerFireworks();
+                triggerFlash();
+                
+                // Reset wheel glow
+                setTimeout(() => {
+                    wheel.style.boxShadow = `
+                        0 0 50px var(--brand-primary),
+                        0 0 100px var(--brand-secondary),
+                        inset 0 0 80px rgba(255, 255, 255, 0.1)
+                    `;
+                }, 2000);
+                
+                // Re-enable buttons
+                document.querySelectorAll('.spin-btn').forEach(btn => btn.disabled = false);
+                
+            }, 5000);
+        }
+        
+        // Activate effect indicator
+        function activateEffect(effectName) {
+            const effects = document.querySelectorAll('.effect-item');
+            effects.forEach(effect => {
+                if (effect.textContent === effectName) {
+                    effect.classList.add('active');
+                    setTimeout(() => effect.classList.remove('active'), 3000);
+                }
+            });
+        }
+        
+        // Create spinning particles
+        function createSpinningParticles() {
+            const container = document.getElementById('particle-container');
+            const colors = ['primary', 'secondary', 'accent', 'gold'];
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    const colorClass = colors[Math.floor(Math.random() * colors.length)];
+                    particle.className = `particle ${colorClass}`;
+                    particle.style.width = '6px';
+                    particle.style.height = '6px';
+                    
+                    // Position in circle around wheel
+                    const angle = (i / 20) * Math.PI * 2;
+                    const radius = 200;
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+                    
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (container.contains(particle)) {
+                            container.removeChild(particle);
+                        }
+                    }, 3000);
+                }, i * 100);
+            }
+        }
+        
+        // Trigger celebration particles
+        function triggerCelebration() {
+            const container = document.getElementById('particle-container');
+            const colors = ['primary', 'secondary', 'accent', 'gold'];
+            
+            for (let i = 0; i < 80; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    const colorClass = colors[Math.floor(Math.random() * colors.length)];
+                    particle.className = `particle ${colorClass}`;
+                    
+                    const size = Math.random() * 8 + 4;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * window.innerWidth + 'px';
+                    particle.style.top = window.innerHeight + 'px';
+                    
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (container.contains(particle)) {
+                            container.removeChild(particle);
+                        }
+                    }, 4000);
+                }, i * 30);
+            }
+            
+            activateEffect('🎆 Celebration Particles');
+        }
+        
+        // Trigger fireworks
+        function triggerFireworks() {
+            const container = document.getElementById('particle-container');
+            const colors = ['primary', 'secondary', 'accent', 'gold'];
+            
+            for (let burst = 0; burst < 5; burst++) {
+                setTimeout(() => {
+                    const centerX = Math.random() * window.innerWidth;
+                    const centerY = Math.random() * (window.innerHeight / 2) + 100;
+                    
+                    for (let i = 0; i < 12; i++) {
+                        const particle = document.createElement('div');
+                        const colorClass = colors[Math.floor(Math.random() * colors.length)];
+                        particle.className = `particle ${colorClass}`;
+                        particle.style.width = '8px';
+                        particle.style.height = '8px';
+                        particle.style.left = centerX + 'px';
+                        particle.style.top = centerY + 'px';
+                        
+                        const angle = (i / 12) * Math.PI * 2;
+                        const distance = Math.random() * 100 + 50;
+                        const endX = centerX + Math.cos(angle) * distance;
+                        const endY = centerY + Math.sin(angle) * distance;
+                        
+                        particle.style.setProperty('--end-x', endX + 'px');
+                        particle.style.setProperty('--end-y', endY + 'px');
+                        particle.style.animation = 'brand-firework 2s ease-out forwards';
+                        
+                        container.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            if (container.contains(particle)) {
+                                container.removeChild(particle);
+                            }
+                        }, 2000);
+                    }
+                }, burst * 300);
+            }
+            
+            activateEffect('🔥 Fireworks Burst');
+        }
+        
+        // Trigger screen flash
+        function triggerFlash() {
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 51, 102, 0.3) 0%, transparent 70%);
+                pointer-events: none;
+                z-index: 1500;
+                animation: brand-flash 0.5s ease-out;
+            `;
+            
+            document.body.appendChild(flash);
+            
+            setTimeout(() => {
+                document.body.removeChild(flash);
+            }, 500);
+            
+            activateEffect('⚡ Screen Flash');
+        }
+        
+        // Show achievement popup
+        function showAchievement() {
+            document.getElementById('achievement-popup').classList.remove('hidden');
+            activateEffect('🏆 Achievement Popup');
+        }
+        
+        // Close achievement popup
+        function closeAchievementPopup() {
+            document.getElementById('achievement-popup').classList.add('hidden');
+        }
+        
+        // Auto-demo on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start ambient particles
+            setInterval(() => {
+                const container = document.getElementById('particle-container');
+                const colors = ['primary', 'secondary', 'accent', 'gold'];
+                const particle = document.createElement('div');
+                const colorClass = colors[Math.floor(Math.random() * colors.length)];
+                particle.className = `particle ${colorClass}`;
+                
+                particle.style.width = '3px';
+                particle.style.height = '3px';
+                particle.style.left = Math.random() * window.innerWidth + 'px';
+                particle.style.top = window.innerHeight + 'px';
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (container.contains(particle)) {
+                        container.removeChild(particle);
+                    }
+                }, 4000);
+            }, 1500);
+            
+            // Welcome message
+            setTimeout(() => {
+                document.getElementById('demo-status').innerHTML = 
+                    '🎨 All enhanced visual effects are now active! Try the demo spins to see them in action! 🚀';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

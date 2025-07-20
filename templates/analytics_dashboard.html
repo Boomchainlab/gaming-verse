@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boombot Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.8em;
+            font-weight: 600;
+        }
+        .developer-info {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 15px;
+            background-color: #e9f7ff;
+            border-radius: 8px;
+            border: 1px solid #b3e0ff;
+        }
+        .developer-info p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+        .developer-info strong {
+            color: #0056b3;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        .card h3 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .card .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        .card .metric-label {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .card.success-score .metric-value {
+            font-size: 3em;
+            color: #27ae60;
+        }
+        .card.success-score .metric-label {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .card.success-score .prediction {
+            font-style: italic;
+            color: #777;
+            margin-top: 10px;
+        }
+        .recommendations-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .recommendations-list li {
+            background-color: #f0f8ff;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 1em;
+            color: #333;
+        }
+        .data-section {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #fdfdfd;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .data-section h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .data-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .chart-container {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .chart-container h3 {
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #777;
+            font-style: italic;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Boombot Analytics Dashboard</h1>
+
+        <div class="developer-info">
+            <p><strong>Developer:</strong> {{ developer.name }} ({{ developer.twitter }})</p>
+            <p><strong>Portfolio:</strong> {{ developer.portfolio }}</p>
+            <p><strong>Rank:</strong> {{ developer.rank }} on 0xppl</p>
+            <p><strong>Bot:</strong> {{ developer.bot }}</p>
+            <p>Last Updated: {{ real_time.timestamp }}</p>
+        </div>
+
+        <div class="grid-container">
+            <div class="card">
+                <h3>Total Users</h3>
+                <div class="metric-value">{{ real_time.total_users }}</div>
+                <div class="metric-label">Overall users</div>
+            </div>
+            <div class="card">
+                <h3>Active Users (24h)</h3>
+                <div class="metric-value">{{ real_time.active_users_24h }}</div>
+                <div class="metric-label">Users active in last 24 hours</div>
+            </div>
+            <div class="card">
+                <h3>New Users Today</h3>
+                <div class="metric-value">{{ real_time.new_users_today }}</div>
+                <div class="metric-label">Users joined today</div>
+            </div>
+            <div class="card">
+                <h3>Total Spins</h3>
+                <div class="metric-value">{{ real_time.total_spins | int | comma_format }}</div>
+                <div class="metric-label">Total game spins</div>
+            </div>
+            <div class="card">
+                <h3>Tokens Distributed</h3>
+                <div class="metric-value">{{ real_time.total_tokens_distributed | int | comma_format }}</div>
+                <div class="metric-label">Creator tokens won by players</div>
+            </div>
+            <div class="card">
+                <h3>Engagement Rate</h3>
+                <div class="metric-value">{{ real_time.engagement_rate }}%</div>
+                <div class="metric-label">Active users / Total users</div>
+            </div>
+            <div class="card">
+                <h3>Growth Rate (Today)</h3>
+                <div class="metric-value">{{ real_time.growth_rate }}%</div>
+                <div class="metric-label">New users today vs. previous total</div>
+            </div>
+            <div class="card">
+                <h3>Viral Coefficient</h3>
+                <div class="metric-value">{{ real_time.viral_coefficient }}</div>
+                <div class="metric-label">Avg. new users per existing user</div>
+            </div>
+        </div>
+
+        <div class="card success-score">
+            <h3>Overall Success Score</h3>
+            <div class="metric-value">{{ success.success_score }} / 100</div>
+            <div class="metric-label">{{ success.success_level }}</div>
+            <p class="prediction">{{ success.prediction }}</p>
+            <h4>Recommendations:</h4>
+            <ul class="recommendations-list">
+                {% for rec in success.recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="data-section">
+            <h2>User Acquisition</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>New Users</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in acquisition.daily_acquisition %}
+                    <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.users }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="chart-container">
+                <h3>Daily User Acquisition (Last 7 Days)</h3>
+                <div class="chart-placeholder">Chart will be rendered here (e.g., using Chart.js)</div>
+            </div>
+            <table class="data-table" style="margin-top: 30px;">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Users</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in acquisition.acquisition_sources %}
+                    <tr>
+                        <td>{{ item.source }}</td>
+                        <td>{{ item.users }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="data-section">
+            <h2>User Engagement</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Usage Count (Last 7 Days)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in engagement.command_usage %}
+                    <tr>
+                        <td>{{ item.command }}</td>
+                        <td>{{ item.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="margin-top: 20px;"><strong>Retained Users (returned after first day):</strong> {{ engagement.retained_users }}</p>
+            <table class="data-table" style="margin-top: 30px;">
+                <thead>
+                    <tr>
+                        <th>Session Length (Spins)</th>
+                        <th>Number of Sessions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in engagement.session_distribution %}
+                    <tr>
+                        <td>{{ item.length }}</td>
+                        <td>{{ item.sessions }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="data-section">
+            <h2>Viral Growth</h2>
+            <p><strong>Total Referrals:</strong> {{ viral.total_referrals }}</p>
+            <p><strong>Total Social Shares (Last 7 Days):</strong> {{ viral.total_shares }}</p>
+            <p><strong>Average Viral Coefficient (Last 7 Days):</strong> {{ viral.avg_viral_coefficient }}</p>
+            <table class="data-table" style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>Referrer</th>
+                        <th>Referrals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in viral.top_referrers %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.referrals }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="chart-container">
+                <h3>Daily Growth Rate (Last 7 Days)</h3>
+                <div class="chart-placeholder">Chart will be rendered here (e.g., using Chart.js)</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Simple Jinja2 filter for comma formatting
+        function comma_format(value) {
+            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# ──────────────────────────────────────────────────────────────
+# Boombot – Telegram Bot container
+# ──────────────────────────────────────────────────────────────
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV USER=botuser
+RUN useradd -m $USER
+WORKDIR /home/$USER/bot
+
+COPY --chown=$USER:$USER requirements.txt .
+# Only install the deps the bot actually needs to keep the image small
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir python-telegram-bot==20.8 web3==6.15.0
+
+COPY --chown=$USER:$USER telegram_bot.py telegram_webhook.py setup_telegram_bot.py ./
+
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "telegram_webhook.py"]

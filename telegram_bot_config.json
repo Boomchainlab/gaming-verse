@@ -1,0 +1,70 @@
+{
+  "bot_info": {
+    "name": "Boombot",
+    "username": "@OkeamahBot",
+    "description": "🦊 Your Web3 gaming companion! Play Creator Coin Spin and win real tokens. Built by verified developer David Okeamah (@okeamah_eth) with $107K portfolio & #91 rank on 0xppl.",
+    "short_description": "🎰 Play Creator Coin Spin and win real tokens! Built by David Okeamah.",
+    "about": "Boombot brings Creator Coin Spin directly to Telegram! Win real Creator tokens with stunning particle effects. Built by verified developer David Okeamah (@okeamah_eth)."
+  },
+  "commands": [
+    {
+      "command": "start",
+      "description": "🚀 Welcome to Boombot! Launch Creator Coin Spin"
+    },
+    {
+      "command": "play",
+      "description": "🎰 Open Creator Coin Spin game"
+    },
+    {
+      "command": "portfolio",
+      "description": "📊 Check your portfolio and stats"
+    },
+    {
+      "command": "leaderboard",
+      "description": "🏆 View top players"
+    },
+    {
+      "command": "help",
+      "description": "❓ Get help and tutorials"
+    },
+    {
+      "command": "settings",
+      "description": "⚙️ Configure bot settings"
+    },
+    {
+      "command": "stats",
+      "description": "📈 View bot and game statistics"
+    }
+  ],
+  "menu_button": {
+    "type": "web_app",
+    "text": "🎰 Play Creator Coin Spin",
+    "web_app": {
+      "url": "https://boomchainlab.blog"
+    }
+  },
+  "web_app": {
+    "url": "https://boomchainlab.blog",
+    "title": "Creator Coin Spin",
+    "description": "Win real Creator tokens with stunning visual effects!"
+  },
+  "developer": {
+    "name": "David Okeamah",
+    "twitter": "@okeamah_eth",
+    "telegram": "@agunnaya001",
+    "github": "BoomchainLabs",
+    "portfolio": "$107K",
+    "rank": "#91",
+    "verified": true
+  },
+  "game_features": [
+    "80 celebration particles on wins",
+    "Firework bursts for big wins",
+    "5 cosmic visual themes",
+    "Real Creator token rewards",
+    "Built on Base network",
+    "Mobile optimized experience",
+    "Daily free spins",
+    "Streak bonuses"
+  ]
+}

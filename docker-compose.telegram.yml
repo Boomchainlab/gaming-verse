@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - PORT=8000
+    depends_on:
+      - bot
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.telegram
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TELEGRAM_BOT_TOKEN
+      - WEBHOOK_URL
+      - WEBAPP_URL
+      - PRIVATE_KEY
+      - TOKEN_ADDRESS
+      - BASE_RPC_URL
+    expose:
+      - "5000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+      - bot
