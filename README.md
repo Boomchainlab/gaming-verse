@@ -188,7 +188,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 *Follow [@agunnaya001](https://twitter.com/agunnaya001) and [@Boomtokn](https://twitter.com/Boomtokn) for updates!*
 \`\`\`
 
-```python file="marketing/boomchain-social-kit.py"
+\`\`\`python file="marketing/boomchain-social-kit.py"
 #!/usr/bin/env python3
 """
 🚀 BoomchainLabs Creator Coin Spin - Personalized Social Media Kit
