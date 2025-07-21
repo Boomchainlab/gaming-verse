@@ -23,23 +23,43 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 boom_bot = BoomBot()
 
-# Initialize bot for webhook
-bot_instance = Bot(token=os.getenv('TELEGRAM_BOT_TOKEN'))
+# Bot configuration
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '7779463152:AAHFq92ODXEhc41f3fDuHIuUkvaPJ8LVJSA')
+WEBHOOK_URL = os.getenv('WEBHOOK_URL', 'https://webhook.boomchainlab.blog/telegram')
 
-@app.route('/webhook', methods=['POST'])
-async def webhook():
-   """Handle Telegram webhook"""
-   try:
-       json_data = request.get_json()
-       update = Update.de_json(json_data, bot_instance)
-       
-       # Process update with bot
-       await boom_bot.application.process_update(update)
-       
-       return jsonify({"status": "ok"})
-   except Exception as e:
-       logger.error(f"Webhook error: {e}")
-       return jsonify({"error": str(e)}), 500
+# Initialize Telegram bot application
+telegram_app = Application.builder().token(BOT_TOKEN).build()
+
+@app.route('/telegram', methods=['POST'])
+async def telegram_webhook():
+    """Handle incoming Telegram webhook updates"""
+    try:
+        # Get the update from Telegram
+        update_data = request.get_json()
+        
+        if not update_data:
+            return jsonify({"error": "No data received"}), 400
+        
+        # Create Update object
+        update = Update.de_json(update_data, telegram_app.bot)
+        
+        # Process the update
+        await telegram_app.process_update(update)
+        
+        return jsonify({"status": "ok"}), 200
+        
+    except Exception as e:
+        logger.error(f"Error processing webhook: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/telegram', methods=['GET'])
+def webhook_info():
+    """Webhook info endpoint"""
+    return jsonify({
+        "status": "active",
+        "webhook_url": WEBHOOK_URL,
+        "bot_token": BOT_TOKEN[:10] + "..." if BOT_TOKEN else "Not set"
+    })
 
 @app.route('/game-event', methods=['POST'])
 def game_event():
@@ -169,16 +189,9 @@ def user_stats(user_id):
        return jsonify({"error": str(e)}), 500
 
 @app.route('/health', methods=['GET'])
-def health():
-   """Health check endpoint"""
-   return jsonify({
-       "status": "healthy",
-       "bot": "Boombot (@OkeamahBot)",
-       "developer": "David Okeamah (@okeamah_eth)",
-       "portfolio": "$107K (↗ 28.49%)",
-       "rank": "#91 on 0xppl",
-       "timestamp": datetime.now().isoformat()
-   })
+def health_check():
+    """Health check endpoint"""
+    return jsonify({"status": "healthy", "service": "telegram_webhook"})
 
 async def send_big_win_notification(user_id: int, event_data: Dict):
    """Send notification for big wins"""
@@ -197,7 +210,7 @@ Built by David Okeamah ({boom_bot.developer_info['rank']})
 Keep spinning for more epic wins! 🚀
        """
        
-       await bot_instance.send_message(
+       await telegram_app.bot.send_message(
            chat_id=user_id,
            text=message,
            parse_mode='Markdown'
@@ -206,5 +219,6 @@ Keep spinning for more epic wins! 🚀
        logger.error(f"Notification error: {e}")
 
 if __name__ == "__main__":
-   port = int(os.getenv('PORT', 8000))
-   app.run(host='0.0.0.0', port=port, debug=False)
+   print("🤖 Starting Telegram Webhook Server...")
+   print(f"📡 Webhook URL: {WEBHOOK_URL}")
+   app.run(host='0.0.0.0', port=8000, debug=True)

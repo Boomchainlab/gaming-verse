@@ -4,74 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creator Coin Spin - Telegram</title>
-    <link rel="stylesheet" href="/static/telegram-styles.css">
-    <!-- Telegram WebApp script (will be injected by Telegram) -->
-    <!-- <script src="https://telegram.org/js/telegram-web-app.js"></script> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='telegram-styles.css') }}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <h1>Creator Coin Spin</h1>
-
-        <div class="player-info section">
-            <h2>Player Profile</h2>
-            <p>Address: <strong id="playerAddressDisplay">Connecting...</strong></p>
-            <p>Username: <strong id="usernameDisplay"></strong></p>
-            <p>Level: <strong id="levelDisplay"></strong></p>
-            <p>XP: <strong id="xpDisplay"></strong></p>
-            <p>Total Tokens Won: <strong id="totalTokensWonDisplay"></strong></p>
-            <p>Daily Streak: <strong id="dailyStreakDisplay"></strong></p>
-            <p>Referral Code: <strong id="referralCodeDisplay"></strong></p>
-            <h3>Achievements:</h3>
-            <ul id="achievementsList" class="achievements-list">
-                <li>Loading achievements...</li>
-            </ul>
-        </div>
-
-        <div class="controls section">
-            <h2>Spin the Wheel!</h2>
-            <select id="spinType">
-                <option value="normal">Normal Spin</option>
-                <option value="mega">Mega Spin</option>
-                <option value="ultra">Ultra Spin</option>
-            </select>
-            <button id="spinButton">SPIN NOW!</button>
-            <p class="result-display">Reward: <span id="rewardDisplay">0</span> Tokens</p>
-            <p>Next Spin: <strong id="nextSpinInDisplay">Loading...</strong></p>
-        </div>
-
-        <div class="social-referral section">
-            <h2>Boost Your Earnings!</h2>
-            <div class="button-group">
-                <button id="socialShareButton">Share on Social Media (Get 100 Tokens!)</button>
+    <div class="telegram-game-container">
+        <!-- Header -->
+        <header class="telegram-header">
+            <h1>🚀 Creator Coin Spin</h1>
+            <div class="user-info" id="telegramUserInfo">
+                <span id="userName">Loading...</span>
             </div>
-            <div class="form-group">
-                <label for="referralInput">Have a Referral Code?</label>
-                <input type="text" id="referralInput" placeholder="Enter code">
-                <button id="applyReferralButton">Apply Referral</button>
+        </header>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats" id="quickStats">
+            <div class="stat">
+                <span class="stat-icon">⭐</span>
+                <span class="stat-value" id="level">1</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon">🔥</span>
+                <span class="stat-value" id="streak">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon">💰</span>
+                <span class="stat-value" id="tokens">0</span>
             </div>
         </div>
 
-        <div class="leaderboard-section section">
-            <h2>Leaderboard</h2>
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player</th>
-                        <th>Level</th>
-                        <th>Tokens</th>
-                        <th>Streak</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardBody">
-                    <tr><td colspan="5">Loading leaderboard...</td></tr>
-                </tbody>
-            </table>
+        <!-- Spin Wheel -->
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <canvas id="telegramWheel" width="300" height="300"></canvas>
+                <button id="telegramSpin" class="telegram-spin-btn">
+                    <span>SPIN</span>
+                    <small>Daily Free Spin</small>
+                </button>
+            </div>
         </div>
 
-        <div id="messageDisplay" class="message"></div>
+        <!-- Connect Wallet Section -->
+        <div class="wallet-section" id="walletSection">
+            <button id="connectTelegramWallet" class="connect-wallet-btn">
+                🔗 Connect Wallet to Play
+            </button>
+            <p class="wallet-hint">Connect your wallet to start earning Creator Coins!</p>
+        </div>
+
+        <!-- Game Actions -->
+        <div class="game-actions" id="gameActions" style="display: none;">
+            <button class="action-btn" onclick="showLeaderboard()">
+                🏆 Leaderboard
+            </button>
+            <button class="action-btn" onclick="showAchievements()">
+                🎯 Achievements
+            </button>
+            <button class="action-btn" onclick="shareGame()">
+                📱 Share Game
+            </button>
+        </div>
+
+        <!-- Result Modal -->
+        <div id="telegramResult" class="result-modal" style="display: none;">
+            <div class="result-content">
+                <div class="result-header">
+                    <h3 id="resultTitle">🎉 Congratulations!</h3>
+                </div>
+                <div class="result-body">
+                    <div class="reward-display">
+                        <span class="reward-amount" id="rewardAmount">0</span>
+                        <span class="reward-label">Creator Coins</span>
+                    </div>
+                    <div class="bonus-info" id="bonusInfo"></div>
+                </div>
+                <button id="closeResult" class="close-result-btn">Continue</button>
+            </div>
+        </div>
     </div>
 
-    <script src="/static/telegram-game.js"></script>
+    <script src="{{ url_for('static', filename='telegram-game.js') }}"></script>
+    <script type="module">
+        import { Analytics } from '@vercel/analytics';
+        Analytics.track('telegram_game_loaded');
+    </script>
 </body>
 </html>

@@ -12,10 +12,10 @@ class DavidOkeamahMarketingKit:
     def __init__(self):
         self.developer_profile = {
             "name": "David Okeamah",
-            "twitter": "@okeamah_eth",
+            "twitter": "agunnaya001".
             "telegram": "@agunnaya001", 
             "github": "BoomchainLabs",
-            "oxppl": "@okeamah_eth",
+            "oxppl": "agunnaya001".
             "portfolio_value": "$107K",
             "portfolio_change": "+28.49%",
             "rank": "#91",
@@ -381,10 +381,10 @@ AVAILABILITY:
 CONTACT:
 David Okeamah
 BoomchainLabs
-Twitter: @okeamah_eth
+Twitter: agunnaya001h
 Telegram: @agunnaya001
 Bot: @OkeamahBot
-Portfolio: https://0xppl.com/okeamah_eth
+Portfolio: https://0xppl.com/agunnaya001
 
 ###
 """

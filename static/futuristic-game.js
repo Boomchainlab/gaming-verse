@@ -1,367 +1,447 @@
+// Game state
+const gameState = {
+  connected: false,
+  playerAddress: null,
+  playerData: null,
+  web3: null,
+  spinning: false,
+}
+
+// Wheel configuration
+const wheelSegments = [
+  { label: "1,000", value: 1000, color: "#ff6b6b" },
+  { label: "2,500", value: 2500, color: "#4ecdc4" },
+  { label: "5,000", value: 5000, color: "#45b7d1" },
+  { label: "10,000", value: 10000, color: "#96ceb4" },
+  { label: "25,000", value: 25000, color: "#feca57" },
+  { label: "50,000", value: 50000, color: "#ff9ff3" },
+  { label: "100,000", value: 100000, color: "#54a0ff" },
+  { label: "MEGA!", value: 250000, color: "#5f27cd" },
+]
+
+// Initialize the game
 document.addEventListener("DOMContentLoaded", () => {
-  const gameWheel = document.getElementById("gameWheel")
-  const spinButton = document.getElementById("spinButton")
-  const rewardDisplay = document.getElementById("rewardDisplay")
-  const messageDisplay = document.getElementById("messageDisplay")
-  const playerAddressDisplay = document.getElementById("playerAddressDisplay")
-  const usernameDisplay = document.getElementById("usernameDisplay")
-  const levelDisplay = document.getElementById("levelDisplay")
-  const xpDisplay = document.getElementById("xpDisplay")
-  const totalTokensWonDisplay = document.getElementById("totalTokensWonDisplay")
-  const dailyStreakDisplay = document.getElementById("dailyStreakDisplay")
-  const nextSpinInDisplay = document.getElementById("nextSpinInDisplay")
-  const achievementsList = document.getElementById("achievementsList")
-  const spinTypeSelect = document.getElementById("spinType")
-  const socialShareButton = document.getElementById("socialShareButton")
-  const referralCodeDisplay = document.getElementById("referralCodeDisplay")
-  const referralInput = document.getElementById("referralInput")
-  const applyReferralButton = document.getElementById("applyReferralButton")
-  const leaderboardBody = document.getElementById("leaderboardBody")
-  const particleContainer = document.getElementById("particle-container")
-  const cosmicBackground = document.getElementById("cosmic-background")
-
-  let currentPlayerAddress = null
-  let isSpinning = false
-
-  // --- Visual Effects Configuration (from environment variables or defaults) ---
-  const ENHANCED_EFFECTS = window.ENHANCED_EFFECTS === "true"
-  const PARTICLE_COUNT = Number.parseInt(window.PARTICLE_COUNT || "80")
-  const FIREWORKS_ENABLED = window.FIREWORKS_ENABLED === "true"
-  const SCREEN_FLASH_ENABLED = window.SCREEN_FLASH_ENABLED === "true"
-  const WHEEL_GLOW_ENABLED = window.WHEEL_GLOW_ENABLED === "true"
-  const BUTTON_SHINE_ENABLED = window.BUTTON_SHINE_ENABLED === "true"
-  const AMBIENT_PARTICLES = window.AMBIENT_PARTICLES === "true"
-  const BRAND_THEME = window.BRAND_THEME || "default" // 'default', 'pink-purple', 'cyan-gold', etc.
-  const ANIMATION_SPEED = window.ANIMATION_SPEED || "normal" // 'slow', 'normal', 'fast'
-  const MOBILE_OPTIMIZED = window.MOBILE_OPTIMIZED === "true"
-
-  // Apply brand theme colors (simplified, in a real app this would load from brand-config.js)
-  const applyTheme = (theme) => {
-    const root = document.documentElement
-    switch (theme) {
-      case "pink-purple":
-        root.style.setProperty("--primary-color", "#FF00FF") // Pink
-        root.style.setProperty("--secondary-color", "#8A2BE2") // Purple
-        root.style.setProperty("--accent-color", "#00FFFF") // Cyan
-        root.style.setProperty("--highlight-color", "#FFD700") // Gold
-        break
-      case "cyan-gold":
-        root.style.setProperty("--primary-color", "#00FFFF")
-        root.style.setProperty("--secondary-color", "#FFD700")
-        root.style.setProperty("--accent-color", "#FF00FF")
-        root.style.setProperty("--highlight-color", "#8A2BE2")
-        break
-      default: // Default theme (already in CSS)
-        break
-    }
-  }
-
-  if (ENHANCED_EFFECTS) {
-    applyTheme(BRAND_THEME)
-    if (WHEEL_GLOW_ENABLED) {
-      gameWheel.classList.add("glow")
-    }
-    if (BUTTON_SHINE_ENABLED) {
-      spinButton.classList.add("shine")
-    }
-    if (AMBIENT_PARTICLES) {
-      createAmbientStars()
-    }
-  }
-
-  const displayMessage = (message, type = "info") => {
-    messageDisplay.textContent = message
-    messageDisplay.className = `message ${type}`
-  }
-
-  const fetchPlayerProfile = async (address) => {
-    try {
-      const response = await fetch(`/api/player/${address}`)
-      const data = await response.json()
-      if (data.error) {
-        displayMessage(`Error: ${data.error}`, "error")
-        return null
-      }
-      return data
-    } catch (error) {
-      console.error("Error fetching player profile:", error)
-      displayMessage("Failed to fetch player profile.", "error")
-      return null
-    }
-  }
-
-  const updateUI = (player) => {
-    if (!player) return
-
-    playerAddressDisplay.textContent = player.address
-    usernameDisplay.textContent = player.username
-    levelDisplay.textContent = player.level
-    xpDisplay.textContent = `${player.xp} / ${player.next_level_xp}`
-    totalTokensWonDisplay.textContent = player.total_tokens_won.toLocaleString()
-    dailyStreakDisplay.textContent = player.daily_streak
-    referralCodeDisplay.textContent = player.referral_code
-
-    spinButton.disabled = !player.can_spin_today || isSpinning
-    nextSpinInDisplay.textContent = player.can_spin_today ? "Ready!" : "Tomorrow"
-
-    achievementsList.innerHTML = ""
-    if (player.achievements && player.achievements.length > 0) {
-      player.achievements.forEach((ach) => {
-        const li = document.createElement("li")
-        li.textContent = `${ach.icon || "⭐"} ${ach.name}`
-        achievementsList.appendChild(li)
-      })
-    } else {
-      const li = document.createElement("li")
-      li.textContent = "No achievements yet. Keep playing!"
-      achievementsList.appendChild(li)
-    }
-  }
-
-  const fetchLeaderboard = async () => {
-    try {
-      const response = await fetch("/api/leaderboard")
-      const data = await response.json()
-      leaderboardBody.innerHTML = ""
-      data.forEach((player) => {
-        const row = leaderboardBody.insertRow()
-        row.insertCell().textContent = player.rank
-        row.insertCell().textContent = player.username
-        row.insertCell().textContent = player.level
-        row.insertCell().textContent = player.total_tokens.toLocaleString()
-        row.insertCell().textContent = player.streak
-      })
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error)
-      displayMessage("Failed to fetch leaderboard.", "error")
-    }
-  }
-
-  // --- Visual Effects Functions ---
-  function createParticle(x, y, color) {
-    if (!ENHANCED_EFFECTS) return
-    const particle = document.createElement("div")
-    particle.className = "particle"
-    particle.style.left = `${x}px`
-    particle.style.top = `${y}px`
-    particle.style.backgroundColor = color
-    particle.style.width = `${Math.random() * 5 + 5}px`
-    particle.style.height = particle.style.width
-    particleContainer.appendChild(particle)
-
-    const angle = Math.random() * Math.PI * 2
-    const distance = Math.random() * 100 + 50
-    const targetX = x + distance * Math.cos(angle)
-    const targetY = y + distance * Math.sin(angle)
-
-    particle.animate(
-      [
-        { transform: `translate(0, 0) scale(1)`, opacity: 1 },
-        { transform: `translate(${targetX - x}px, ${targetY - y}px) scale(0)`, opacity: 0 },
-      ],
-      {
-        duration: 1500 + Math.random() * 500,
-        easing: "ease-out",
-        fill: "forwards",
-      },
-    ).onfinish = () => particle.remove()
-  }
-
-  function createFireworks(x, y, colors) {
-    if (!ENHANCED_EFFECTS || !FIREWORKS_ENABLED) return
-    for (let i = 0; i < 20; i++) {
-      const firework = document.createElement("div")
-      firework.className = "firework"
-      firework.style.left = `${x}px`
-      firework.style.top = `${y}px`
-      firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      particleContainer.appendChild(firework)
-
-      const angle = Math.random() * Math.PI * 2
-      const distance = Math.random() * 80 + 20
-      const targetX = x + distance * Math.cos(angle)
-      const targetY = y + distance * Math.sin(angle)
-
-      firework.animate(
-        [
-          { transform: `translate(0, 0) scale(0)`, opacity: 1 },
-          { transform: `translate(${targetX - x}px, ${targetY - y}px) scale(1.5)`, opacity: 0 },
-        ],
-        {
-          duration: 800 + Math.random() * 200,
-          easing: "ease-out",
-          fill: "forwards",
-        },
-      ).onfinish = () => firework.remove()
-    }
-  }
-
-  function triggerScreenFlash() {
-    if (!ENHANCED_EFFECTS || !SCREEN_FLASH_ENABLED) return
-    const flash = document.createElement("div")
-    flash.className = "screen-flash"
-    document.body.appendChild(flash)
-    flash.addEventListener("animationend", () => flash.remove())
-  }
-
-  function createAmbientStars() {
-    if (!ENHANCED_EFFECTS || !AMBIENT_PARTICLES) return
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement("div")
-      star.className = "star"
-      star.style.left = `${Math.random() * 100}%`
-      star.style.top = `${Math.random() * 100}%`
-      star.style.width = `${Math.random() * 2 + 1}px`
-      star.style.height = star.style.width
-      star.style.animationDelay = `${Math.random() * 5}s`
-      cosmicBackground.appendChild(star)
-    }
-  }
-
-  // --- Spin Logic ---
-  spinButton.addEventListener("click", async () => {
-    if (!currentPlayerAddress || isSpinning) {
-      displayMessage("Please connect your wallet and wait for the current spin to finish.", "error")
-      return
-    }
-
-    isSpinning = true
-    spinButton.disabled = true
-    displayMessage("Spinning the cosmic wheel...", "info")
-    rewardDisplay.textContent = "..."
-
-    // Simulate spin animation
-    const randomDegree = Math.floor(Math.random() * 360) + 360 * 5 // Spin at least 5 full rotations
-    gameWheel.style.transition = `transform ${ANIMATION_SPEED === "fast" ? 3 : ANIMATION_SPEED === "slow" ? 6 : 4}s cubic-bezier(0.25, 0.1, 0.25, 1)`
-    gameWheel.style.transform = `rotate(${randomDegree}deg)`
-
-    // Fetch spin result from backend after a delay (simulating spin duration)
-    setTimeout(
-      async () => {
-        try {
-          const spinType = spinTypeSelect.value
-          const response = await fetch("/api/spin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ address: currentPlayerAddress, spin_type: spinType }),
-          })
-          const data = await response.json()
-
-          if (data.success) {
-            rewardDisplay.textContent = data.reward.toLocaleString()
-            displayMessage(`You won ${data.reward.toLocaleString()} tokens!`, "success")
-
-            // Trigger visual effects for win
-            if (ENHANCED_EFFECTS) {
-              triggerScreenFlash()
-              const wheelRect = gameWheel.getBoundingClientRect()
-              const centerX = wheelRect.left + wheelRect.width / 2
-              const centerY = wheelRect.top + wheelRect.height / 2
-
-              for (let i = 0; i < PARTICLE_COUNT; i++) {
-                createParticle(centerX, centerY, `hsl(${Math.random() * 360}, 100%, 50%)`)
-              }
-              if (data.reward >= 10000 && FIREWORKS_ENABLED) {
-                // Big win threshold
-                createFireworks(centerX, centerY, ["#FF00FF", "#00FFFF", "#FFD700"])
-              }
-            }
-
-            const updatedPlayer = await fetchPlayerProfile(currentPlayerAddress)
-            updateUI(updatedPlayer)
-            fetchLeaderboard()
-          } else {
-            displayMessage(`Spin failed: ${data.error}`, "error")
-            rewardDisplay.textContent = "0"
-          }
-        } catch (error) {
-          console.error("Error during spin:", error)
-          displayMessage("Failed to perform spin.", "error")
-          rewardDisplay.textContent = "0"
-        } finally {
-          isSpinning = false
-          spinButton.disabled = false
-          // Reset wheel transition for next spin
-          gameWheel.style.transition = "none"
-          gameWheel.style.transform = `rotate(${randomDegree % 360}deg)` // Keep final orientation
-        }
-      },
-      ANIMATION_SPEED === "fast" ? 3000 : ANIMATION_SPEED === "slow" ? 6000 : 4000,
-    ) // Match spin duration
-  })
-
-  socialShareButton.addEventListener("click", async () => {
-    if (!currentPlayerAddress) {
-      displayMessage("Please connect your wallet first.", "error")
-      return
-    }
-
-    try {
-      const response = await fetch("/api/social-share", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: currentPlayerAddress, platform: "web" }), // Assuming web share
-      })
-      const data = await response.json()
-
-      if (data.success) {
-        displayMessage(`Shared on social media! You received ${data.bonus_tokens} bonus tokens.`, "success")
-        const updatedPlayer = await fetchPlayerProfile(currentPlayerAddress)
-        updateUI(updatedPlayer)
-      } else {
-        displayMessage(`Social share failed: ${data.error}`, "error")
-      }
-    } catch (error) {
-      console.error("Error during social share:", error)
-      displayMessage("Failed to record social share.", "error")
-    }
-  })
-
-  applyReferralButton.addEventListener("click", async () => {
-    const code = referralInput.value.trim()
-    if (!code) {
-      displayMessage("Please enter a referral code.", "error")
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/referral/${code}`)
-      const data = await response.json()
-      if (data.valid) {
-        displayMessage(`Referral code valid! You will receive a bonus when you sign up.`, "success")
-        // In a real app, you'd store this referral code in session/local storage
-        // and apply it when the user connects their wallet for the first time.
-      } else {
-        displayMessage("Invalid referral code.", "error")
-      }
-    } catch (error) {
-      console.error("Error checking referral:", error)
-      displayMessage("Failed to check referral code.", "error")
-    }
-  })
-
-  // Initialize Web3 and connect wallet (simplified for demo)
-  const initWeb3 = async () => {
-    displayMessage("Connecting wallet...", "info")
-    setTimeout(async () => {
-      // Simulate a connected wallet address
-      const simulatedAddress =
-        "0x" +
-        Array(40)
-          .fill(0)
-          .map(() => Math.floor(Math.random() * 16).toString(16))
-          .join("")
-      currentPlayerAddress = simulatedAddress
-      displayMessage(
-        `Wallet connected: ${simulatedAddress.substring(0, 6)}...${simulatedAddress.substring(simulatedAddress.length - 4)}`,
-        "success",
-      )
-
-      const player = await fetchPlayerProfile(currentPlayerAddress)
-      updateUI(player)
-      fetchLeaderboard()
-    }, 1000)
-  }
-
-  initWeb3()
+  initializeGame()
+  setupEventListeners()
+  drawWheel()
 })
+
+function initializeGame() {
+  // Check if Web3 is available
+  if (typeof window.ethereum !== "undefined") {
+    const Web3 = window.Web3 // Declare Web3 variable
+    gameState.web3 = new Web3(window.ethereum)
+    console.log("Web3 detected")
+  } else {
+    console.log("Please install MetaMask")
+    showError("Please install MetaMask to play this game")
+  }
+}
+
+function setupEventListeners() {
+  // Connect wallet button
+  document.getElementById("connectWallet").addEventListener("click", connectWallet)
+
+  // Spin button
+  document.getElementById("spinButton").addEventListener("click", spinWheel)
+
+  // Close result button
+  document.getElementById("closeResult").addEventListener("click", closeResult)
+}
+
+async function connectWallet() {
+  if (!gameState.web3) {
+    showError("Web3 not available")
+    return
+  }
+
+  try {
+    showLoading(true)
+
+    // Request account access
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    })
+
+    if (accounts.length > 0) {
+      gameState.playerAddress = accounts[0]
+      gameState.connected = true
+
+      // Update UI
+      updateWalletUI()
+
+      // Load player data
+      await loadPlayerData()
+
+      // Enable spin button
+      document.getElementById("spinButton").disabled = false
+    }
+  } catch (error) {
+    console.error("Error connecting wallet:", error)
+    showError("Failed to connect wallet")
+  } finally {
+    showLoading(false)
+  }
+}
+
+function updateWalletUI() {
+  const connectBtn = document.getElementById("connectWallet")
+  const walletInfo = document.getElementById("walletInfo")
+  const playerStats = document.getElementById("playerStats")
+
+  if (gameState.connected) {
+    connectBtn.style.display = "none"
+    walletInfo.style.display = "block"
+    playerStats.style.display = "grid"
+
+    // Update wallet address display
+    const addressElement = document.getElementById("walletAddress")
+    if (addressElement) {
+      addressElement.textContent = `${gameState.playerAddress.slice(0, 6)}...${gameState.playerAddress.slice(-4)}`
+    }
+  }
+}
+
+async function loadPlayerData() {
+  try {
+    const response = await fetch(`/api/player/${gameState.playerAddress}`)
+    const data = await response.json()
+
+    if (response.ok) {
+      gameState.playerData = data
+      updatePlayerStats()
+      loadAchievements()
+      loadLeaderboard()
+    } else {
+      console.error("Error loading player data:", data.error)
+    }
+  } catch (error) {
+    console.error("Error loading player data:", error)
+  }
+}
+
+function updatePlayerStats() {
+  if (!gameState.playerData) return
+
+  const data = gameState.playerData
+
+  // Update stat displays
+  document.getElementById("playerLevel").textContent = data.level
+  document.getElementById("playerStreak").textContent = data.daily_streak
+  document.getElementById("totalWon").textContent = data.total_tokens_won.toLocaleString()
+  document.getElementById("playerXP").textContent = data.xp.toLocaleString()
+
+  // Update referral code
+  document.getElementById("referralCode").value = data.referral_code
+
+  // Update spin button state
+  const spinButton = document.getElementById("spinButton")
+  const spinText = spinButton.querySelector(".spin-cost")
+
+  if (data.can_spin_today) {
+    spinButton.disabled = false
+    spinText.textContent = "Free Daily Spin"
+  } else {
+    spinButton.disabled = true
+    spinText.textContent = "Come back tomorrow!"
+  }
+}
+
+async function spinWheel() {
+  if (gameState.spinning || !gameState.connected) return
+
+  try {
+    gameState.spinning = true
+    showLoading(true)
+
+    // Animate wheel spin
+    animateWheelSpin()
+
+    // Make API call to spin
+    const response = await fetch("/api/spin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: gameState.playerAddress,
+        spin_type: "normal",
+      }),
+    })
+
+    const result = await response.json()
+
+    if (response.ok && result.success) {
+      // Show result after animation
+      setTimeout(() => {
+        showSpinResult(result)
+        updatePlayerStats()
+      }, 3000)
+    } else {
+      showError(result.error || "Spin failed")
+    }
+  } catch (error) {
+    console.error("Error spinning:", error)
+    showError("Failed to spin")
+  } finally {
+    gameState.spinning = false
+    showLoading(false)
+  }
+}
+
+function animateWheelSpin() {
+  const canvas = document.getElementById("wheelCanvas")
+  const ctx = canvas.getContext("2d")
+  let rotation = 0
+  let speed = 0.3
+  const deceleration = 0.99
+
+  function animate() {
+    rotation += speed
+    speed *= deceleration
+
+    // Clear and redraw wheel
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawWheel(rotation)
+
+    if (speed > 0.01) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  animate()
+}
+
+function drawWheel(rotation = 0) {
+  const canvas = document.getElementById("wheelCanvas")
+  const ctx = canvas.getContext("2d")
+  const centerX = canvas.width / 2
+  const centerY = canvas.height / 2
+  const radius = Math.min(centerX, centerY) - 10
+
+  ctx.save()
+  ctx.translate(centerX, centerY)
+  ctx.rotate(rotation)
+
+  const segmentAngle = (2 * Math.PI) / wheelSegments.length
+
+  wheelSegments.forEach((segment, index) => {
+    const startAngle = index * segmentAngle
+    const endAngle = startAngle + segmentAngle
+
+    // Draw segment
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.arc(0, 0, radius, startAngle, endAngle)
+    ctx.closePath()
+    ctx.fillStyle = segment.color
+    ctx.fill()
+    ctx.strokeStyle = "#fff"
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Draw text
+    ctx.save()
+    ctx.rotate(startAngle + segmentAngle / 2)
+    ctx.textAlign = "center"
+    ctx.fillStyle = "#fff"
+    ctx.font = "bold 16px Arial"
+    ctx.fillText(segment.label, radius * 0.7, 5)
+    ctx.restore()
+  })
+
+  ctx.restore()
+
+  // Draw center circle
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI)
+  ctx.fillStyle = "#333"
+  ctx.fill()
+  ctx.strokeStyle = "#fff"
+  ctx.lineWidth = 3
+  ctx.stroke()
+}
+
+function showSpinResult(result) {
+  const resultDisplay = document.getElementById("resultDisplay")
+  const resultTitle = document.getElementById("resultTitle")
+  const resultMessage = document.getElementById("resultMessage")
+  const rewardTokens = document.getElementById("rewardTokens")
+  const rewardXP = document.getElementById("rewardXP")
+
+  resultTitle.textContent = "Congratulations! 🎉"
+  resultMessage.textContent = `You won ${result.reward.toLocaleString()} Creator Coins!`
+  rewardTokens.textContent = result.reward.toLocaleString()
+  rewardXP.textContent = result.xp_gained.toLocaleString()
+
+  resultDisplay.style.display = "flex"
+
+  // Track analytics
+  const Analytics = window.Analytics // Declare Analytics variable
+  if (typeof Analytics !== "undefined") {
+    Analytics.track("spin_completed", {
+      reward: result.reward,
+      level: result.new_level,
+      streak: result.streak,
+    })
+  }
+}
+
+function closeResult() {
+  document.getElementById("resultDisplay").style.display = "none"
+  loadPlayerData() // Refresh player data
+}
+
+async function loadAchievements() {
+  if (!gameState.playerData) return
+
+  const achievementsList = document.getElementById("achievementsList")
+  const achievements = gameState.playerData.achievements || []
+
+  const allAchievements = [
+    { name: "First Spin", icon: "🎯", description: "Complete your first spin" },
+    { name: "Token Collector", icon: "💰", description: "Collect 10,000 tokens" },
+    { name: "Streak Master", icon: "🔥", description: "Maintain a 7-day streak" },
+    { name: "Level Up", icon: "⭐", description: "Reach level 5" },
+    { name: "Social Butterfly", icon: "📱", description: "Share 5 times" },
+  ]
+
+  achievementsList.innerHTML = ""
+
+  allAchievements.forEach((achievement) => {
+    const isUnlocked = achievements.includes(achievement.name)
+    const achievementElement = document.createElement("div")
+    achievementElement.className = `achievement-item ${isUnlocked ? "achievement-unlocked" : ""}`
+
+    achievementElement.innerHTML = `
+            <div class="achievement-icon">${achievement.icon}</div>
+            <div class="achievement-info">
+                <div class="achievement-name">${achievement.name}</div>
+                <div class="achievement-description">${achievement.description}</div>
+            </div>
+            ${isUnlocked ? '<div class="achievement-status">✅</div>' : '<div class="achievement-status">🔒</div>'}
+        `
+
+    achievementsList.appendChild(achievementElement)
+  })
+}
+
+async function loadLeaderboard() {
+  try {
+    const response = await fetch("/api/leaderboard")
+    const leaderboard = await response.json()
+
+    if (response.ok) {
+      displayLeaderboard(leaderboard)
+    }
+  } catch (error) {
+    console.error("Error loading leaderboard:", error)
+  }
+}
+
+function displayLeaderboard(leaderboard) {
+  const leaderboardElement = document.getElementById("leaderboard")
+  leaderboardElement.innerHTML = ""
+
+  leaderboard.slice(0, 10).forEach((player) => {
+    const playerElement = document.createElement("div")
+    playerElement.className = "leaderboard-item"
+
+    let rankClass = ""
+    if (player.rank === 1) rankClass = "gold"
+    else if (player.rank === 2) rankClass = "silver"
+    else if (player.rank === 3) rankClass = "bronze"
+
+    playerElement.innerHTML = `
+            <div class="player-info">
+                <span class="rank ${rankClass}">#${player.rank}</span>
+                <span class="username">${player.username}</span>
+                <span class="address">${player.address}</span>
+            </div>
+            <div class="player-stats">
+                <span class="level">Lv.${player.level}</span>
+                <span class="tokens">${player.total_tokens.toLocaleString()} CC</span>
+            </div>
+        `
+
+    leaderboardElement.appendChild(playerElement)
+  })
+}
+
+// Social sharing functions
+function shareToTelegram() {
+  const text = `🚀 I'm playing Creator Coin Spin Game and earning tokens! Join me and use my referral code: ${gameState.playerData?.referral_code || "PLAY2024"}`
+  const url = window.location.href
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, "_blank")
+
+  // Track share
+  trackSocialShare("telegram")
+}
+
+function shareToTwitter() {
+  const text = `🚀 Just won tokens playing Creator Coin Spin Game! 🎮💰 Join the fun and earn crypto rewards daily! #CreatorCoin #Web3Gaming`
+  const url = window.location.href
+  window.open(
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    "_blank",
+  )
+
+  // Track share
+  trackSocialShare("twitter")
+}
+
+async function trackSocialShare(platform) {
+  if (!gameState.connected) return
+
+  try {
+    const response = await fetch("/api/social-share", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: gameState.playerAddress,
+        platform: platform,
+      }),
+    })
+
+    const result = await response.json()
+
+    if (result.success) {
+      showSuccess(`+${result.bonus_tokens} tokens for sharing!`)
+      loadPlayerData() // Refresh stats
+    }
+  } catch (error) {
+    console.error("Error tracking share:", error)
+  }
+}
+
+function copyReferralCode() {
+  const referralInput = document.getElementById("referralCode")
+  referralInput.select()
+  document.execCommand("copy")
+  showSuccess("Referral code copied!")
+}
+
+// Utility functions
+function showLoading(show) {
+  const overlay = document.getElementById("loadingOverlay")
+  overlay.style.display = show ? "flex" : "none"
+}
+
+function showError(message) {
+  // Simple alert for now - could be enhanced with custom modal
+  alert(`Error: ${message}`)
+}
+
+function showSuccess(message) {
+  // Simple alert for now - could be enhanced with custom toast
+  alert(message)
+}
+
+// Auto-refresh player data every 30 seconds
+setInterval(() => {
+  if (gameState.connected) {
+    loadPlayerData()
+  }
+}, 30000)

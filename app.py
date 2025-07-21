@@ -13,9 +13,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Futuristic Game Configuration
-GAS_PAYER_PRIVATE_KEY = os.getenv("PRIVATE_KEY")
-TOKEN_ADDRESS = os.getenv("TOKEN_ADDRESS")
-BASE_RPC_URL = os.getenv("BASE_RPC_URL")
+GAS_PAYER_PRIVATE_KEY = os.getenv("PRIVATE_KEY", "0xf2fb82b350cbf5a09b60a0e89ccbc766c59d1e1a66d9747041f864353b76dfde")
+TOKEN_ADDRESS = os.getenv("TOKEN_ADDRESS", "0xcd96b6aded93fb64c295bdba10865765f5e7acbe")
+BASE_RPC_URL = os.getenv("BASE_RPC_URL", "https://mainnet.base.org")
 
 # Social & Viral Features
 REFERRAL_BONUS = 500  # Bonus tokens for referrals
@@ -57,15 +57,15 @@ class SpinResult(db.Model):
     player_address = db.Column(db.String(42), nullable=False)
     reward_amount = db.Column(db.Integer, nullable=False)
     spin_type = db.Column(db.String(20), default='normal')  # normal, mega, ultra
-    multiplier = db.Column(slice, default=1.0)
-    tx_hash = db.Column(slice, default='0x')
+    multiplier = db.Column(db.Float, default=1.0)
+    tx_hash = db.Column(db.String(66))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Achievement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
-    icon = db.Column(slice, default='🎯')
+    icon = db.Column(db.String(10), default='🎯')
     reward_tokens = db.Column(db.Integer, default=0)
     requirement_type = db.Column(db.String(50))  # spins, tokens, streak, referrals
     requirement_value = db.Column(db.Integer)

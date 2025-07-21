@@ -1,195 +1,294 @@
-/* Base styles for the Telegram WebApp */
-body {
-  font-family: "Roboto", sans-serif; /* Standard Telegram font */
+* {
   margin: 0;
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  background-color: var(--tg-theme-bg-color, #f0f2f5); /* Telegram theme background */
-  color: var(--tg-theme-text-color, #333); /* Telegram theme text color */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--tg-theme-bg-color, #ffffff);
+  color: var(--tg-theme-text-color, #000000);
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+.telegram-game-container {
+  max-width: 100%;
+  padding: 16px;
+  min-height: 100vh;
+}
+
+/* Header */
+.telegram-header {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--tg-theme-hint-color, #999999);
+  margin-bottom: 20px;
+}
+
+.telegram-header h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--tg-theme-text-color, #000000);
+  margin-bottom: 10px;
+}
+
+.user-info {
+  font-size: 0.9rem;
+  color: var(--tg-theme-hint-color, #999999);
+}
+
+/* Quick Stats */
+.quick-stats {
+  display: flex;
+  justify-content: space-around;
+  background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.stat {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  min-height: 100vh;
-  padding: 15px;
-  box-sizing: border-box;
+  gap: 4px;
 }
 
-/* Ensure the Telegram WebApp API is loaded */
-/* This is a placeholder, in a real app, Telegram.WebApp would be globally available */
-/* if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
-} */
-
-.app-container {
-  background: var(--tg-theme-secondary-bg-color, #ffffff); /* Telegram theme secondary background */
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 100%;
-  max-width: 450px; /* Max width for mobile-first design */
-  margin-bottom: 20px;
+.stat-icon {
+  font-size: 1.5rem;
 }
 
-h1 {
-  color: var(--tg-theme-link-color, #007bff); /* Telegram theme link color */
-  font-size: 1.8em;
-  margin-bottom: 15px;
-  font-weight: 600;
+.stat-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--tg-theme-text-color, #000000);
 }
 
-.section {
-  margin-bottom: 20px;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: var(--tg-theme-bg-color, #f8f8f8);
-  border: 1px solid var(--tg-theme-hint-color, #e0e0e0);
-}
-
-.section h2 {
-  color: var(--tg-theme-text-color, #2c3e50);
-  font-size: 1.3em;
-  margin-top: 0;
-  border-bottom: 1px solid var(--tg-theme-hint-color, #e9ecef);
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-
-.button-group {
+/* Wheel Section */
+.wheel-section {
   display: flex;
-  flex-direction: column; /* Stack buttons on mobile */
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
-button {
-  background-color: var(--tg-theme-button-color, #007bff); /* Telegram theme button color */
-  color: var(--tg-theme-button-text-color, white); /* Telegram theme button text color */
-  padding: 12px 20px;
+.wheel-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+#telegramWheel {
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: conic-gradient(
+    from 0deg,
+    #ff6b6b 0deg 45deg,
+    #4ecdc4 45deg 90deg,
+    #45b7d1 90deg 135deg,
+    #96ceb4 135deg 180deg,
+    #feca57 180deg 225deg,
+    #ff9ff3 225deg 270deg,
+    #54a0ff 270deg 315deg,
+    #5f27cd 315deg 360deg
+  );
+}
+
+.telegram-spin-btn {
+  background: var(--tg-theme-button-color, #2481cc);
   border: none;
-  border-radius: 8px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  color: var(--tg-theme-button-text-color, #ffffff);
+  font-weight: bold;
   cursor: pointer;
-  font-size: 1.1em;
-  transition: background-color 0.3s ease;
-  width: 100%; /* Full width buttons */
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-button:hover {
-  background-color: var(--tg-theme-button-color, #0056b3); /* Darker on hover */
-  filter: brightness(0.9);
+.telegram-spin-btn:hover:not(:disabled) {
+  transform: scale(1.05);
 }
 
-button:disabled {
-  background-color: var(--tg-theme-hint-color, #cccccc);
+.telegram-spin-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-  opacity: 0.7;
 }
 
-input[type="text"],
-input[type="number"] {
-  width: calc(100% - 20px);
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid var(--tg-theme-hint-color, #ccc);
-  border-radius: 5px;
-  box-sizing: border-box;
-  background-color: var(--tg-theme-bg-color, #fff);
-  color: var(--tg-theme-text-color, #333);
+.telegram-spin-btn span {
+  font-size: 1rem;
+  font-weight: bold;
 }
 
-.message {
-  margin-top: 15px;
-  padding: 10px;
-  border-radius: 5px;
+.telegram-spin-btn small {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+/* Wallet Section */
+.wallet-section {
   text-align: center;
+  padding: 24px;
+  background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.connect-wallet-btn {
+  background: var(--tg-theme-button-color, #2481cc);
+  border: none;
+  padding: 16px 32px;
+  border-radius: 24px;
+  color: var(--tg-theme-button-text-color, #ffffff);
   font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
 }
 
-.message.info {
-  background-color: rgba(0, 191, 255, 0.1);
-  color: #00bfff;
-  border: 1px solid #00bfff;
+.connect-wallet-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-.message.success {
-  background-color: rgba(0, 255, 0, 0.1);
-  color: #00cc00;
-  border: 1px solid #00cc00;
+.wallet-hint {
+  font-size: 0.9rem;
+  color: var(--tg-theme-hint-color, #999999);
+  margin: 0;
 }
 
-.message.error {
-  background-color: rgba(255, 0, 0, 0.1);
-  color: #cc0000;
-  border: 1px solid #cc0000;
+/* Game Actions */
+.game-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.player-info p,
-.leaderboard-section p {
-  margin: 8px 0;
-  color: var(--tg-theme-text-color, #555);
+.action-btn {
+  background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+  border: 1px solid var(--tg-theme-hint-color, #999999);
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: var(--tg-theme-text-color, #000000);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.player-info strong {
-  color: var(--tg-theme-link-color, #007bff);
+.action-btn:hover {
+  background: var(--tg-theme-button-color, #2481cc);
+  color: var(--tg-theme-button-text-color, #ffffff);
 }
 
-.achievements-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-}
-
-.achievements-list li {
-  background: var(--tg-theme-secondary-bg-color, #eee);
-  padding: 8px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  font-size: 0.9em;
-  color: var(--tg-theme-text-color, #333);
-}
-
-.leaderboard-table {
+/* Result Modal */
+.result-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.leaderboard-table th,
-.leaderboard-table td {
-  border: 1px solid var(--tg-theme-hint-color, #ddd);
-  padding: 8px;
-  text-align: left;
-  color: var(--tg-theme-text-color, #333);
+.result-content {
+  background: var(--tg-theme-bg-color, #ffffff);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.leaderboard-table th {
-  background-color: var(--tg-theme-secondary-bg-color, #f2f2f2);
-  color: var(--tg-theme-text-color, #333);
+.result-header h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: var(--tg-theme-text-color, #000000);
+}
+
+.reward-display {
+  margin: 24px 0;
+}
+
+.reward-amount {
+  display: block;
+  font-size: 2.5rem;
   font-weight: bold;
+  color: var(--tg-theme-button-color, #2481cc);
+  margin-bottom: 8px;
 }
 
-.leaderboard-table tr:nth-child(even) {
-  background-color: var(--tg-theme-bg-color, #f9f9f9);
+.reward-label {
+  font-size: 1rem;
+  color: var(--tg-theme-hint-color, #999999);
 }
 
-.leaderboard-table tr:hover {
-  background-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
+.bonus-info {
+  font-size: 0.9rem;
+  color: var(--tg-theme-hint-color, #999999);
+  margin: 16px 0;
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 400px) {
-  .app-container {
-    padding: 15px;
+.close-result-btn {
+  background: var(--tg-theme-button-color, #2481cc);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 24px;
+  color: var(--tg-theme-button-text-color, #ffffff);
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Responsive adjustments for Telegram */
+@media (max-width: 480px) {
+  .telegram-game-container {
+    padding: 12px;
   }
-  h1 {
-    font-size: 1.5em;
+
+  .telegram-header h1 {
+    font-size: 1.5rem;
   }
-  .section h2 {
-    font-size: 1.1em;
+
+  #telegramWheel {
+    width: 250px;
+    height: 250px;
   }
-  button {
-    padding: 10px 15px;
-    font-size: 1em;
+
+  .telegram-spin-btn {
+    width: 80px;
+    height: 80px;
+  }
+
+  .quick-stats {
+    padding: 12px;
+  }
+
+  .game-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--tg-theme-bg-color, #1a1a1a);
+    color: var(--tg-theme-text-color, #ffffff);
   }
 }

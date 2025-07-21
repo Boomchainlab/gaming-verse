@@ -1,205 +1,348 @@
+// Telegram Web App specific game logic
+const telegramGameState = {
+  connected: false,
+  playerAddress: null,
+  playerData: null,
+  web3: null,
+  spinning: false,
+  telegramUser: null,
+}
+
+// Declare Web3 variable
+const Web3 = window.Web3
+
+// Initialize Telegram Web App
 document.addEventListener("DOMContentLoaded", () => {
-  const spinButton = document.getElementById("spinButton")
-  const rewardDisplay = document.getElementById("rewardDisplay")
-  const messageDisplay = document.getElementById("messageDisplay")
-  const playerAddressDisplay = document.getElementById("playerAddressDisplay")
-  const usernameDisplay = document.getElementById("usernameDisplay")
-  const levelDisplay = document.getElementById("levelDisplay")
-  const xpDisplay = document.getElementById("xpDisplay")
-  const totalTokensWonDisplay = document.getElementById("totalTokensWonDisplay")
-  const dailyStreakDisplay = document.getElementById("dailyStreakDisplay")
-  const nextSpinInDisplay = document.getElementById("nextSpinInDisplay")
-  const achievementsList = document.getElementById("achievementsList")
-  const spinTypeSelect = document.getElementById("spinType")
-  const socialShareButton = document.getElementById("socialShareButton")
-  const referralCodeDisplay = document.getElementById("referralCodeDisplay")
-  const referralInput = document.getElementById("referralInput")
-  const applyReferralButton = document.getElementById("applyReferralButton")
-  const leaderboardBody = document.getElementById("leaderboardBody")
-
-  let currentPlayerAddress = null
-
-  const displayMessage = (message, type = "info") => {
-    messageDisplay.textContent = message
-    messageDisplay.className = `message ${type}`
-  }
-
-  const fetchPlayerProfile = async (address) => {
-    try {
-      const response = await fetch(`/api/player/${address}`)
-      const data = await response.json()
-      if (data.error) {
-        displayMessage(`Error: ${data.error}`, "error")
-        return null
-      }
-      return data
-    } catch (error) {
-      console.error("Error fetching player profile:", error)
-      displayMessage("Failed to fetch player profile.", "error")
-      return null
-    }
-  }
-
-  const updateUI = (player) => {
-    if (!player) return
-
-    playerAddressDisplay.textContent = player.address
-    usernameDisplay.textContent = player.username
-    levelDisplay.textContent = player.level
-    xpDisplay.textContent = `${player.xp} / ${player.next_level_xp}`
-    totalTokensWonDisplay.textContent = player.total_tokens_won.toLocaleString()
-    dailyStreakDisplay.textContent = player.daily_streak
-    referralCodeDisplay.textContent = player.referral_code
-
-    spinButton.disabled = !player.can_spin_today
-    nextSpinInDisplay.textContent = player.can_spin_today ? "Ready!" : "Tomorrow"
-
-    achievementsList.innerHTML = ""
-    if (player.achievements && player.achievements.length > 0) {
-      player.achievements.forEach((ach) => {
-        const li = document.createElement("li")
-        li.textContent = `${ach.icon || "⭐"} ${ach.name}`
-        achievementsList.appendChild(li)
-      })
-    } else {
-      const li = document.createElement("li")
-      li.textContent = "No achievements yet. Keep playing!"
-      achievementsList.appendChild(li)
-    }
-  }
-
-  const fetchLeaderboard = async () => {
-    try {
-      const response = await fetch("/api/leaderboard")
-      const data = await response.json()
-      leaderboardBody.innerHTML = ""
-      data.forEach((player) => {
-        const row = leaderboardBody.insertRow()
-        row.insertCell().textContent = player.rank
-        row.insertCell().textContent = player.username
-        row.insertCell().textContent = player.level
-        row.insertCell().textContent = player.total_tokens.toLocaleString()
-        row.insertCell().textContent = player.streak
-      })
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error)
-      displayMessage("Failed to fetch leaderboard.", "error")
-    }
-  }
-
-  spinButton.addEventListener("click", async () => {
-    if (!currentPlayerAddress) {
-      displayMessage("Please connect your wallet first.", "error")
-      return
-    }
-
-    spinButton.disabled = true
-    displayMessage("Spinning the wheel...", "info")
-    rewardDisplay.textContent = "..."
-
-    try {
-      const spinType = spinTypeSelect.value
-      const response = await fetch("/api/spin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: currentPlayerAddress, spin_type: spinType }),
-      })
-      const data = await response.json()
-
-      if (data.success) {
-        rewardDisplay.textContent = data.reward.toLocaleString()
-        displayMessage(`You won ${data.reward.toLocaleString()} tokens!`, "success")
-        const updatedPlayer = await fetchPlayerProfile(currentPlayerAddress)
-        updateUI(updatedPlayer)
-        fetchLeaderboard()
-      } else {
-        displayMessage(`Spin failed: ${data.error}`, "error")
-        rewardDisplay.textContent = "0"
-      }
-    } catch (error) {
-      console.error("Error during spin:", error)
-      displayMessage("Failed to perform spin.", "error")
-      rewardDisplay.textContent = "0"
-    } finally {
-      spinButton.disabled = false
-    }
-  })
-
-  socialShareButton.addEventListener("click", async () => {
-    if (!currentPlayerAddress) {
-      displayMessage("Please connect your wallet first.", "error")
-      return
-    }
-
-    try {
-      const response = await fetch("/api/social-share", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: currentPlayerAddress, platform: "telegram" }), // Assuming Telegram share
-      })
-      const data = await response.json()
-
-      if (data.success) {
-        displayMessage(`Shared on social media! You received ${data.bonus_tokens} bonus tokens.`, "success")
-        const updatedPlayer = await fetchPlayerProfile(currentPlayerAddress)
-        updateUI(updatedPlayer)
-      } else {
-        displayMessage(`Social share failed: ${data.error}`, "error")
-      }
-    } catch (error) {
-      console.error("Error during social share:", error)
-      displayMessage("Failed to record social share.", "error")
-    }
-  })
-
-  applyReferralButton.addEventListener("click", async () => {
-    const code = referralInput.value.trim()
-    if (!code) {
-      displayMessage("Please enter a referral code.", "error")
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/referral/${code}`)
-      const data = await response.json()
-      if (data.valid) {
-        displayMessage(`Referral code valid! You will receive a bonus when you sign up.`, "success")
-        // In a real app, you'd store this referral code in session/local storage
-        // and apply it when the user connects their wallet for the first time.
-      } else {
-        displayMessage("Invalid referral code.", "error")
-      }
-    } catch (error) {
-      console.error("Error checking referral:", error)
-      displayMessage("Failed to check referral code.", "error")
-    }
-  })
-
-  // Initialize Web3 and connect wallet (simplified for Telegram WebApp context)
-  const initWeb3 = async () => {
-    // In a real Telegram WebApp, you'd use window.Telegram.WebApp.initDataUnsafe
-    // to get user info and potentially a wallet address if Telegram provides it.
-    // For this demo, we'll simulate a wallet connection.
-    displayMessage("Connecting wallet...", "info")
-    setTimeout(async () => {
-      // Simulate a connected wallet address
-      const simulatedAddress =
-        "0x" +
-        Array(40)
-          .fill(0)
-          .map(() => Math.floor(Math.random() * 16).toString(16))
-          .join("")
-      currentPlayerAddress = simulatedAddress
-      displayMessage(
-        `Wallet connected: ${simulatedAddress.substring(0, 6)}...${simulatedAddress.substring(simulatedAddress.length - 4)}`,
-        "success",
-      )
-
-      const player = await fetchPlayerProfile(currentPlayerAddress)
-      updateUI(player)
-      fetchLeaderboard()
-    }, 1000)
-  }
-
-  initWeb3()
+  initializeTelegramGame()
+  setupTelegramEventListeners()
+  drawTelegramWheel()
 })
+
+function initializeTelegramGame() {
+  // Initialize Telegram Web App
+  if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp
+    tg.ready()
+    tg.expand()
+
+    // Get user info
+    telegramGameState.telegramUser = tg.initDataUnsafe?.user
+
+    if (telegramGameState.telegramUser) {
+      document.getElementById("userName").textContent = telegramGameState.telegramUser.first_name || "Player"
+    }
+
+    // Set theme
+    document.body.style.backgroundColor = tg.themeParams.bg_color || "#ffffff"
+    document.body.style.color = tg.themeParams.text_color || "#000000"
+  }
+
+  // Check if Web3 is available
+  if (typeof window.ethereum !== "undefined") {
+    telegramGameState.web3 = new Web3(window.ethereum)
+    console.log("Web3 detected in Telegram")
+  }
+}
+
+function setupTelegramEventListeners() {
+  // Connect wallet button
+  document.getElementById("connectTelegramWallet").addEventListener("click", connectTelegramWallet)
+
+  // Spin button
+  document.getElementById("telegramSpin").addEventListener("click", telegramSpin)
+
+  // Close result button
+  document.getElementById("closeResult").addEventListener("click", closeTelegramResult)
+}
+
+async function connectTelegramWallet() {
+  if (!telegramGameState.web3) {
+    showTelegramError("Web3 not available. Please use a Web3-enabled browser.")
+    return
+  }
+
+  try {
+    // Request account access
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    })
+
+    if (accounts.length > 0) {
+      telegramGameState.playerAddress = accounts[0]
+      telegramGameState.connected = true
+
+      // Update UI
+      updateTelegramWalletUI()
+
+      // Load player data
+      await loadTelegramPlayerData()
+    }
+  } catch (error) {
+    console.error("Error connecting wallet:", error)
+    showTelegramError("Failed to connect wallet")
+  }
+}
+
+function updateTelegramWalletUI() {
+  const walletSection = document.getElementById("walletSection")
+  const gameActions = document.getElementById("gameActions")
+  const spinButton = document.getElementById("telegramSpin")
+
+  if (telegramGameState.connected) {
+    walletSection.style.display = "none"
+    gameActions.style.display = "grid"
+    spinButton.disabled = false
+  }
+}
+
+async function loadTelegramPlayerData() {
+  try {
+    const response = await fetch(`/api/player/${telegramGameState.playerAddress}`)
+    const data = await response.json()
+
+    if (response.ok) {
+      telegramGameState.playerData = data
+      updateTelegramStats()
+    } else {
+      console.error("Error loading player data:", data.error)
+    }
+  } catch (error) {
+    console.error("Error loading player data:", error)
+  }
+}
+
+function updateTelegramStats() {
+  if (!telegramGameState.playerData) return
+
+  const data = telegramGameState.playerData
+
+  // Update quick stats
+  document.getElementById("level").textContent = data.level
+  document.getElementById("streak").textContent = data.daily_streak
+  document.getElementById("tokens").textContent = data.total_tokens_won.toLocaleString()
+
+  // Update spin button state
+  const spinButton = document.getElementById("telegramSpin")
+  const spinText = spinButton.querySelector("small")
+
+  if (data.can_spin_today) {
+    spinButton.disabled = false
+    spinText.textContent = "Daily Free Spin"
+  } else {
+    spinButton.disabled = true
+    spinText.textContent = "Come back tomorrow!"
+  }
+}
+
+async function telegramSpin() {
+  if (telegramGameState.spinning || !telegramGameState.connected) return
+
+  try {
+    telegramGameState.spinning = true
+
+    // Animate wheel spin
+    animateTelegramWheelSpin()
+
+    // Make API call to spin
+    const response = await fetch("/api/spin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: telegramGameState.playerAddress,
+        spin_type: "normal",
+      }),
+    })
+
+    const result = await response.json()
+
+    if (response.ok && result.success) {
+      // Show result after animation
+      setTimeout(() => {
+        showTelegramSpinResult(result)
+        updateTelegramStats()
+      }, 3000)
+    } else {
+      showTelegramError(result.error || "Spin failed")
+    }
+  } catch (error) {
+    console.error("Error spinning:", error)
+    showTelegramError("Failed to spin")
+  } finally {
+    telegramGameState.spinning = false
+  }
+}
+
+function animateTelegramWheelSpin() {
+  const canvas = document.getElementById("telegramWheel")
+  const ctx = canvas.getContext("2d")
+  let rotation = 0
+  let speed = 0.3
+  const deceleration = 0.99
+
+  function animate() {
+    rotation += speed
+    speed *= deceleration
+
+    // Clear and redraw wheel
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawTelegramWheel(rotation)
+
+    if (speed > 0.01) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  animate()
+}
+
+function drawTelegramWheel(rotation = 0) {
+  const canvas = document.getElementById("telegramWheel")
+  const ctx = canvas.getContext("2d")
+  const centerX = canvas.width / 2
+  const centerY = canvas.height / 2
+  const radius = Math.min(centerX, centerY) - 10
+
+  const segments = [
+    { label: "1K", color: "#ff6b6b" },
+    { label: "2.5K", color: "#4ecdc4" },
+    { label: "5K", color: "#45b7d1" },
+    { label: "10K", color: "#96ceb4" },
+    { label: "25K", color: "#feca57" },
+    { label: "50K", color: "#ff9ff3" },
+    { label: "100K", color: "#54a0ff" },
+    { label: "MEGA", color: "#5f27cd" },
+  ]
+
+  ctx.save()
+  ctx.translate(centerX, centerY)
+  ctx.rotate(rotation)
+
+  const segmentAngle = (2 * Math.PI) / segments.length
+
+  segments.forEach((segment, index) => {
+    const startAngle = index * segmentAngle
+    const endAngle = startAngle + segmentAngle
+
+    // Draw segment
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.arc(0, 0, radius, startAngle, endAngle)
+    ctx.closePath()
+    ctx.fillStyle = segment.color
+    ctx.fill()
+    ctx.strokeStyle = "#fff"
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Draw text
+    ctx.save()
+    ctx.rotate(startAngle + segmentAngle / 2)
+    ctx.textAlign = "center"
+    ctx.fillStyle = "#fff"
+    ctx.font = "bold 14px Arial"
+    ctx.fillText(segment.label, radius * 0.7, 5)
+    ctx.restore()
+  })
+
+  ctx.restore()
+
+  // Draw center circle
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI)
+  ctx.fillStyle = "#333"
+  ctx.fill()
+  ctx.strokeStyle = "#fff"
+  ctx.lineWidth = 2
+  ctx.stroke()
+}
+
+function showTelegramSpinResult(result) {
+  const resultModal = document.getElementById("telegramResult")
+  const resultTitle = document.getElementById("resultTitle")
+  const rewardAmount = document.getElementById("rewardAmount")
+  const bonusInfo = document.getElementById("bonusInfo")
+
+  resultTitle.textContent = "🎉 Congratulations!"
+  rewardAmount.textContent = result.reward.toLocaleString()
+
+  let bonusText = ""
+  if (result.multipliers.total > 1) {
+    bonusText = `Bonus multiplier: ${result.multipliers.total.toFixed(2)}x`
+  }
+  if (result.streak > 1) {
+    bonusText += ` | Streak: ${result.streak} days`
+  }
+  bonusInfo.textContent = bonusText
+
+  resultModal.style.display = "flex"
+
+  // Haptic feedback if available
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.HapticFeedback.impactOccurred("medium")
+  }
+
+  // Track analytics
+  const Analytics = window.Analytics // Declare Analytics variable
+  if (typeof Analytics !== "undefined") {
+    Analytics.track("telegram_spin_completed", {
+      reward: result.reward,
+      level: result.new_level,
+      streak: result.streak,
+      user_id: telegramGameState.telegramUser?.id,
+    })
+  }
+}
+
+function closeTelegramResult() {
+  document.getElementById("telegramResult").style.display = "none"
+  loadTelegramPlayerData() // Refresh player data
+}
+
+// Telegram-specific functions
+function showLeaderboard() {
+  // Could open a new view or send data back to Telegram
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.showAlert("Leaderboard feature coming soon!")
+  }
+}
+
+function showAchievements() {
+  // Could open a new view or send data back to Telegram
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.showAlert("Achievements feature coming soon!")
+  }
+}
+
+function shareGame() {
+  const shareText = `🚀 I'm playing Creator Coin Spin Game and earning tokens! Join me: ${window.location.href}`
+
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.switchInlineQuery(shareText, ["users", "groups"])
+  } else {
+    // Fallback to regular sharing
+    if (navigator.share) {
+      navigator.share({
+        title: "Creator Coin Spin Game",
+        text: shareText,
+        url: window.location.href,
+      })
+    }
+  }
+}
+
+function showTelegramError(message) {
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.showAlert(`Error: ${message}`)
+  } else {
+    alert(`Error: ${message}`)
+  }
+}
+
+// Auto-refresh player data every 30 seconds
+setInterval(() => {
+  if (telegramGameState.connected) {
+    loadTelegramPlayerData()
+  }
+}, 30000)

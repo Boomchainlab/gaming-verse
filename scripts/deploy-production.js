@@ -8,9 +8,9 @@ const PRODUCTION_CONFIG = {
   name: "creator-coin-spin",
   description: "🚀 Futuristic spin-to-win game with Creator tokens on Base",
   homepage: "https://creator-coin-spin.vercel.app",
-  repository: "https://github.com/yourusername/creator-coin-spin",
+  repository: "https://github.com/BoomchainLabs/creator-coin-spin",
   keywords: ["web3", "gaming", "crypto", "base", "tokens", "spin", "win"],
-  author: "Your Name",
+  author: "BoomchainLabs",
   license: "MIT",
 }
 
