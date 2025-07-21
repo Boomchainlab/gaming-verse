@@ -1,7 +1,0 @@
-.git
-node_modules
-__pycache__
-*.pyc
-*.pyo
-tests/
-.env
