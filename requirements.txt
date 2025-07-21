@@ -5,5 +5,5 @@ python-telegram-bot==20.8
 gunicorn==21.2.0
 requests==2.31.0
 python-dotenv==1.0.0
-eth-account==0.10.0
+eth-account==0.13.7
 cryptography==41.0.8
