@@ -24,7 +24,7 @@ app = Flask(__name__)
 boom_bot = BoomBot()
 
 # Bot configuration
-BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '7779463152:AAHFq92ODXEhc41f3fDuHIuUkvaPJ8LVJSA')
+TELEGRAM_BOT_TOKEN=
 WEBHOOK_URL = os.getenv('WEBHOOK_URL', 'https://webhook.boomchainlab.blog/telegram')
 
 # Initialize Telegram bot application
