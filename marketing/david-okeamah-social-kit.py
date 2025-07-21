@@ -45,7 +45,7 @@ class DavidOkeamahMarketingKit:
         tweets = [
             {
                 "type": "main_launch",
-                "account": "@okeamah_eth",
+                "account": "agunnaya001",
                 "content": """🚀 JUST LAUNCHED: Creator Coin Spin! 🎰
 
 After weeks of development, I'm excited to share my latest Web3 game on Base!
@@ -71,7 +71,7 @@ Built by @BoomchainLabs 💪
             },
             {
                 "type": "telegram_bot_announcement",
-                "account": "@okeamah_eth", 
+                "account": "agunnaya001"., 
                 "content": """🦊 Introducing Boombot (@OkeamahBot)! 
 
 My new Telegram bot that brings Creator Coin Spin directly to your chat!
@@ -91,7 +91,7 @@ Try it: @OkeamahBot
             },
             {
                 "type": "developer_story",
-                "account": "@okeamah_eth", 
+                "account": "agunnaya001", 
                 "content": """👨‍💻 Developer Story Thread 🧵
 
 Building Creator Coin Spin + Boombot taught me so much about Web3 gaming UX.
@@ -105,7 +105,7 @@ From web app to Telegram mini app - here's what I learned... 1/7
             },
             {
                 "type": "technical_deep_dive",
-                "account": "@okeamah_eth",
+                "account": "agunnaya001",
                 "content": """🔧 Technical Deep Dive: Creator Coin Spin + Boombot
 
 Built with:
@@ -132,7 +132,7 @@ Rank: #91 on 0xppl
 Drop a screenshot of your biggest win below! 👇
 
 Play via:
-🌐 Web app: [LINK]
+🌐 Web app: https://boomchainlab.blog
 🦊 Telegram: @OkeamahBot
 
 I'll retweet the top 5 and send bonus tokens to the winners! 🪙
@@ -161,7 +161,7 @@ Meet @OkeamahBot - your Web3 gaming companion!
 • Get real-time game notifications
 • Community management tools
 
-Built by David Okeamah (@okeamah_eth):
+Built by David Okeamah (agunnaya001):
 ✅ Verified developer on 0xppl
 💰 $107K portfolio (↗ 28.49%)
 📊 #91 rank
@@ -226,7 +226,7 @@ Try it: @OkeamahBot""",
                 "title": "🚀 Just launched Creator Coin Spin + Telegram bot - Web3 game with 80 particle effects!",
                 "content": """Hey r/CryptoGaming! 
 
-I'm David Okeamah (@okeamah_eth), a verified developer with a $107K portfolio and #91 rank on 0xppl.
+I'm David Okeamah (agunnaya001), a verified developer with a $107K portfolio and #91 rank on 0xppl.
 
 Just launched Creator Coin Spin - a futuristic Web3 game on Base network with Telegram bot integration!
 
@@ -246,7 +246,7 @@ Just launched Creator Coin Spin - a futuristic Web3 game on Base network with Te
 - 🏢 BoomchainLabs organization
 
 **Play Options:**
-- 🌐 Web app: [LINK]
+- 🌐 Web app: https://boomchainlab.blog
 - 🦊 Telegram bot: @OkeamahBot
 
 The visual effects rival mobile games but run entirely in the browser. The Telegram integration makes it super accessible!
@@ -272,7 +272,7 @@ Would love your feedback! What features would you want to see next?""",
 - Mobile-optimized gameplay
 
 **Developer Background:**
-I'm David Okeamah (@okeamah_eth), verified developer with $107K portfolio and #91 rank on 0xppl.
+I'm David Okeamah (agunnaya001), verified developer with $107K portfolio and #91 rank on 0xppl.
 
 **Technical Stack:**
 - Telegram Bot API
@@ -321,11 +321,11 @@ Looking for feedback from the bot community! What features would you add?""",
                 }
             ],
             "inline_keyboard": [
-                [{"text": "🎰 Play Creator Coin Spin", "web_app": {"url": "https://your-game-url.com"}}],
+                [{"text": "🎰 Play Creator Coin Spin", "web_app": {"url": "https:/boomchainlab.blog"}}],
                 [{"text": "📊 Portfolio", "callback_data": "portfolio"}],
                 [{"text": "🏆 Leaderboard", "callback_data": "leaderboard"}],
-                [{"text": "🌐 Web Version", "url": "https://your-game-url.com"}],
-                [{"text": "🐦 Follow @okeamah_eth", "url": "https://twitter.com/okeamah_eth"}]
+                [{"text": "🌐 Web Version", "url": "https://boomchainlab.blog"}],
+                [{"text": "🐦 Follow agunnaya001", "url": "https://twitter.com/agunnaya001"}]
             ]
         }
     
@@ -339,7 +339,7 @@ Revolutionary Web3 Game with Telegram Integration
 
 BoomchainLabs Introduces First Web3 Game with 80 Particle System and Native Telegram Bot
 
-[DATE] - David Okeamah (@okeamah_eth), a verified developer with $107K portfolio and #91 rank on 0xppl, today announced the launch of Creator Coin Spin and Boombot (@OkeamahBot), a groundbreaking Web3 game that combines console-quality visual effects with seamless Telegram integration.
+[DATE] - David Okeamah (agunnaya001), a verified developer with $107K portfolio and #91 rank on 0xppl, today announced the launch of Creator Coin Spin and Boombot (@OkeamahBot), a groundbreaking Web3 game that combines console-quality visual effects with seamless Telegram integration.
 
 DEVELOPER CREDENTIALS:
 • Verified developer on 0xppl platform
@@ -374,7 +374,7 @@ Built with vanilla JavaScript for optimal performance, the game achieves 60fps a
 "I wanted to make Web3 gaming as accessible as traditional mobile games," said David Okeamah. "Boombot brings Creator Coin Spin directly to Telegram, where users can play and win real tokens without leaving their favorite messaging app."
 
 AVAILABILITY:
-• Web: [LINK]
+• Web: https://boomchainlab.blog
 • Telegram Bot: @OkeamahBot
 • Supports all major Web3 wallets on Base network
 
