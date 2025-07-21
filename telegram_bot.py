@@ -13,7 +13,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Bot configuration
-BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '7779463152:AAHFq92ODXEhc41f3fDuHIuUkvaPJ8LVJSA')
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN=
 WEBAPP_URL = os.getenv('WEBAPP_URL', 'https://boomchainlab.blog')
 
 class BoomBot:
