@@ -32,7 +32,7 @@
     "hardhat": "latest",
     "hardhat-gas-reporter": "latest",
     "lucide-react": "^0.454.0",
-    "next": "14.2.16",
+    "next": "14.2.30",
     "path": "latest",
     "react": "^18",
     "react-dom": "^18",
