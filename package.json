@@ -31,7 +31,7 @@
     "fs": "latest",
     "hardhat": "latest",
     "hardhat-gas-reporter": "latest",
-    "lucide-react": "^0.454.0",
+    "lucide-react": "^0.525.0",
     "next": "14.2.30",
     "path": "latest",
     "react": "^18",
