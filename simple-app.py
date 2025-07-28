@@ -33,7 +33,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Your configuration
-GAS_PAYER_PRIVATE_KEY = "0xf2fb82b350cbf5a09b60a0e89ccbc766c59d1e1a66d9747041f864353b76dfde"
+GAS_PAYER_PRIVATE_KEY = ""
 TOKEN_ADDRESS = "0xcd96b6aded93fb64c295bdba10865765f5e7acbe"
 BASE_RPC_URL = "https://mainnet.base.org"
 

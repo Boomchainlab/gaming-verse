@@ -12,7 +12,7 @@ def setup_environment():
     print("🔧 Setting up environment...")
     
     # Set your private key
-    os.environ['PRIVATE_KEY'] = '0x21fa1bf8dc9793971382c89776e623f9177e4e30b24537d1b2f9383dc46a00c6'
+    os.environ['PRIVATE_KEY'] = ''
     
     print("✅ Environment configured")
 

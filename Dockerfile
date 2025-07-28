@@ -3,7 +3,7 @@
 # Telegram webhook (port 8000) behind Nginx (port 80).
 # Vercel only needs one Dockerfile at the repo root.
 # ──────────────────────────────────────────────────────────────
-FROM python:3.11-slim AS base
+FROM python:3.13-slim AS base
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app

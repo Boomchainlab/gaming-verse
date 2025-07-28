@@ -1,32 +1,54 @@
 {
   "name": "creator-coin-spin-game",
-  "version": "1.0.0",
-  "description": "Futuristic Creator Coin Spin Game with Telegram Bot Integration",
-  "main": "app.py",
-  "homepage": "https://creator-coin-spin.vercel.app",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/BoomchainLabs/creator-coin-spin.git"
-  },
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "build": "echo 'Building with Docker'",
-    "start": "python app.py",
-    "dev": "python app.py",
-    "deploy": "vercel --prod",
-    "test": "echo 'No tests specified'"
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.3.1"
+    "@nomicfoundation/hardhat-chai-matchers": "latest",
+    "@nomicfoundation/hardhat-ethers": "latest",
+    "@nomicfoundation/hardhat-ignition-ethers": "latest",
+    "@nomicfoundation/hardhat-network-helpers": "latest",
+    "@nomicfoundation/hardhat-toolbox": "latest",
+    "@nomicfoundation/hardhat-verify": "latest",
+    "@typechain/ethers-v6": "latest",
+    "@typechain/hardhat": "latest",
+    "@types/chai": "latest",
+    "@types/mocha": "latest",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "chai": "latest",
+    "child_process": "latest",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "latest",
+    "ethers": "latest",
+    "fs": "latest",
+    "hardhat": "latest",
+    "hardhat-gas-reporter": "latest",
+    "lucide-react": "^0.525.0",
+    "next": "15.4.4",
+    "path": "latest",
+    "react": "^18",
+    "react-dom": "^18",
+    "solidity-coverage": "latest",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss": "^3.3.0",
+    "tailwindcss-animate": "^1.0.7",
+    "ts-node": "latest",
+    "typechain": "latest",
+    "typescript": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.16.5",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
-  },
-  "keywords": ["blockchain", "gaming", "telegram", "web3", "creator-coin"],
-  "author": "BoomchainLabs",
-  "license": "MIT"
+    "@types/node": "^22",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "postcss": "^8.5",
+    "typescript": "^5"
+  }
 }
