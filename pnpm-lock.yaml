@@ -75,8 +75,8 @@ importers:
         specifier: latest
         version: 2.3.0(hardhat@2.26.1(ts-node@10.9.2(@types/node@20.19.9)(typescript@5.8.3))(typescript@5.8.3))(typescript@5.8.3)
       lucide-react:
-        specifier: ^0.525.0
-        version: 0.525.0(react@19.1.1)
+        specifier: ^0.536.0
+        version: 0.536.0(react@19.1.1)
       next:
         specifier: 15.4.4
         version: 15.4.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -1713,8 +1713,8 @@ packages:
   lru_map@0.3.3:
     resolution: {integrity: sha512-Pn9cox5CsMYngeDbmChANltQl+5pi6XmTrraMSzhPmMBbmgcxmqWry0U3PGapCU1yB4/LqCcom7qhHZiF/jGfQ==}
 
-  lucide-react@0.525.0:
-    resolution: {integrity: sha512-Tm1txJ2OkymCGkvwoHt33Y2JpN5xucVq1slHcgE6Lk0WjDfjgKWor5CdVER8U6DvcfMwh4M8XxmpTiyzfmfDYQ==}
+  lucide-react@0.536.0:
+    resolution: {integrity: sha512-2PgvNa9v+qz4Jt/ni8vPLt4jwoFybXHuubQT8fv4iCW5TjDxkbZjNZZHa485ad73NSEn/jdsEtU57eE1g+ma8A==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -4364,7 +4364,7 @@ snapshots:
 
   lru_map@0.3.3: {}
 
-  lucide-react@0.525.0(react@19.1.1):
+  lucide-react@0.536.0(react@19.1.1):
     dependencies:
       react: 19.1.1
 
