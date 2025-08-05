@@ -1,41 +1,56 @@
 # ──────────────────────────────────────────────────────────────
-# Single image that serves BOTH Flask (port 5000) and
-# Telegram webhook (port 8000) behind Nginx (port 80).
-# Vercel only needs one Dockerfile at the repo root.
+# Flask API (5000) + Telegram Webhook (8000) behind Nginx (8080)
+# Single Dockerfile for Vercel — no external nginx.conf needed
 # ──────────────────────────────────────────────────────────────
-FROM python:3.13-slim AS base
+FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
-# System libs for building some wheels
+# 1. Install system + Python deps + Nginx
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential libssl-dev curl && \
+    build-essential libssl-dev curl nginx && \
     rm -rf /var/lib/apt/lists/*
 
-# -----------------  install Python deps  --------------------
+# 2. Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt gunicorn python-telegram-bot==20.8
 
-# -----------------  copy source code  -----------------------
+# 3. Copy all app source
 COPY . .
 
-# -----------------  Nginx  ----------------------------------
-RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
-COPY nginx.conf /etc/nginx/nginx.conf
+# 4. Inline Nginx configuration
+RUN printf '%s\n' \
+    'worker_processes 1;' \
+    'events { worker_connections 1024; }' \
+    'http {' \
+    '  include       mime.types;' \
+    '  default_type  application/octet-stream;' \
+    '  sendfile        on;' \
+    '  server {' \
+    '    listen 8080;' \
+    '    location / {' \
+    '      proxy_pass http://127.0.0.1:5000;' \
+    '      proxy_set_header Host $host;' \
+    '      proxy_set_header X-Real-IP $remote_addr;' \
+    '    }' \
+    '    location /telegram {' \
+    '      proxy_pass http://127.0.0.1:8000;' \
+    '      proxy_set_header Host $host;' \
+    '      proxy_set_header X-Real-IP $remote_addr;' \
+    '    }' \
+    '  }' \
+    '}' > /etc/nginx/nginx.conf
 
-# Create an unprivileged user
+# 5. Use non-root user for security
 RUN useradd -m runner
 USER runner
 
-# Expose ONLY the port Vercel expects (8080 -> remapped to 80)
+# 6. Vercel exposes port 8080
 EXPOSE 8080
 
-# -----------------  Entrypoint  -----------------------------
-# 1.  start gunicorn (Flask app) on :5000
-# 2.  start telegram_webhook (FastAPI/Flask) on :8000
-# 3.  start nginx in foreground on :8080 and proxy / -> 5000, /telegram -> 8000
+# 7. Start Flask (port 5000), Telegram (8000), and Nginx (8080)
 CMD ["/bin/sh", "-c", "\
   gunicorn --bind 0.0.0.0:5000 app:app & \
   python telegram_webhook.py & \
