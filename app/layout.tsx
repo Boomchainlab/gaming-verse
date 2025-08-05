@@ -1,20 +1,18 @@
-import type { Metadata } from 'next'
-import './globals.css'
+"use client";
 
-export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
-}
+import "@/lib/reown-appkit";
+import ConnectButton from "@/components/ConnectButton";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <header className="flex justify-between items-center p-4 bg-white shadow">
+          <h1 className="text-xl font-bold">SLERFEARN</h1>
+          <ConnectButton />
+        </header>
+        <main className="p-6">{children}</main>
+      </body>
     </html>
-  )
+  );
 }
