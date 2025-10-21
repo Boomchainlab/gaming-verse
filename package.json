@@ -19,7 +19,7 @@
     "@typechain/hardhat": "latest",
     "@types/chai": "latest",
     "@types/mocha": "latest",
-    "@types/node": "^20.0.0",
+    "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "chai": "latest",
