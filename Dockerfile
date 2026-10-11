@@ -2,7 +2,7 @@
 # Flask API (5000) + Telegram Webhook (8000) behind Nginx (8080)
 # Single Dockerfile for Vercel — no external nginx.conf needed
 # ──────────────────────────────────────────────────────────────
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
